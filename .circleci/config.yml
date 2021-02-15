@@ -1,0 +1,21 @@
+version: 2.1
+
+jobs:
+  build0:
+    docker:
+      - image: cyversevice/xpra:20.04
+    steps:
+      - checkout
+      - run: xpra --version
+  build1:
+    docker:
+      - image: cyversevice/xpra:cudagl-20.04
+    steps:
+      - checkout
+      - run: xpra --version
+      
+workflows:
+  build:
+    jobs:
+      - build0
+      - build1
