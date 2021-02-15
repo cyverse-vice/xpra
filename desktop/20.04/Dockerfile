@@ -87,6 +87,11 @@ RUN apt-get install -y curl grep sed dpkg && \
     rm tini.deb && \
     apt-get clean
 
+# Add the user to sudo
+RUN apt-get update && apt-get install -y sudo
+RUN usermod -aG sudo user
+RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
 USER user
 
 ENV DISPLAY=:100
