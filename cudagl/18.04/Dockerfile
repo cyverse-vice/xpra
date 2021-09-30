@@ -37,14 +37,17 @@ RUN wget https://files.renci.org/pub/irods/releases/4.1.12/ubuntu14/irods-icomma
     rm irods-icommands-4.1.12-ubuntu14-x86_64.deb
 
 # Install VirtualGL for testing
-RUN cd /tmp && wget https://sourceforge.net/projects/virtualgl/files/2.6.3/virtualgl_2.6.3_amd64.deb/download -O virtualgl_2.6.3_amd64.deb && \
-    dpkg -i --force-depends virtualgl_2.6.3_amd64.deb && \
-    apt-get -f install && \
+
+RUN apt install -y libegl1-mesa
+
+RUN cd /tmp && wget 'https://downloads.sourceforge.net/project/virtualgl/2.6.90%20%283.0beta1%29/virtualgl_2.6.90_amd64.deb?ts=gAAAAABhVh46kFWwxLZvYTh02FoHGu9ypAsXEJxwq0dG9tju2u9eoLrfnaau7zmHdY_7TBUucTh-ZNKGG_2FBUyQfQzH5Jscxw%3D%3D&use_mirror=managedway&r=https%3A%2F%2Fsourceforge.net%2Fprojects%2Fvirtualgl%2Ffiles%2F2.6.90%2520%25283.0beta1%2529%2Fvirtualgl_2.6.90_amd64.deb%2Fdownload%3Fuse_mirror%3Dmanagedway' -O virtualgl_2.6.90_amd64.deb && \
+    dpkg -i --force-depends virtualgl_2.6.90_amd64.deb && \
+    apt-get -f install -y && \
     rm -rf /tmp/*.deb
 
 # Install NVIDIA drivers --experimental
 #RUN add-apt-repository ppa:graphics-drivers/ppa && apt update \
-#    && apt install -y nvidia-driver-450
+#    && apt install -y nvidia-driver-460
 
 RUN mkdir -p /run/user/1000/xpra
 RUN mkdir -p /run/xpra

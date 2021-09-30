@@ -19,10 +19,14 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
 # install XPRA: https://xpra.org/trac/wiki/Usage/Docker 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && \
-    apt-get install -y wget gnupg2 apt-transport-https && \
-    wget -O - https://xpra.org/gpg.asc | apt-key add - && \
-    echo "deb https://xpra.org/ focal main" > /etc/apt/sources.list.d/xpra.list
+RUN apt update && \
+    apt install -y wget \
+    gnupg2 \ 
+    apt-transport-https \
+    ca-certificates
+
+RUN wget -q https://xpra.org/gpg.asc -O- | apt-key add - && \
+    echo "deb https://xpra.org/ focal main" >> /etc/apt/sources.list.d/xpra.list
 
 RUN apt-get update && \
     apt-get install -y xpra \

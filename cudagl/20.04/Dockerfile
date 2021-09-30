@@ -18,15 +18,17 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
 # install XPRA: https://xpra.org/trac/wiki/Usage/Docker 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && \
-    apt-get install -y wget \
+RUN apt update && \
+    apt install -y wget \
     gnupg2 \ 
-    apt-transport-https && \
-    wget -O - https://xpra.org/gpg.asc | apt-key add - && \
-    echo "deb https://xpra.org/ focal main" > /etc/apt/sources.list.d/xpra.list
+    apt-transport-https \
+    ca-certificates
 
-RUN apt-get update && \
-    apt-get install -y xpra \
+RUN wget -q https://xpra.org/gpg.asc -O- | apt-key add - && \
+    echo "deb https://xpra.org/ focal main" >> /etc/apt/sources.list.d/xpra.list
+
+RUN apt update && \
+    apt install -y xpra \
     xvfb \
     xterm \
     sshfs && \
@@ -100,9 +102,12 @@ RUN wget -qO - https://packages.irods.org/irods-signing-key.asc | apt-key add - 
 RUN apt install -y irods-icommands
 
 # Install VirtualGL for testing
-RUN cd /tmp && wget https://sourceforge.net/projects/virtualgl/files/2.6.3/virtualgl_2.6.3_amd64.deb/download -O virtualgl_2.6.3_amd64.deb && \
-    dpkg -i --force-depends virtualgl_2.6.3_amd64.deb && \
-    apt-get -f install && \
+
+RUN apt install -y libegl1-mesa
+
+RUN cd /tmp && wget 'https://downloads.sourceforge.net/project/virtualgl/2.6.90%20%283.0beta1%29/virtualgl_2.6.90_amd64.deb?ts=gAAAAABhVh46kFWwxLZvYTh02FoHGu9ypAsXEJxwq0dG9tju2u9eoLrfnaau7zmHdY_7TBUucTh-ZNKGG_2FBUyQfQzH5Jscxw%3D%3D&use_mirror=managedway&r=https%3A%2F%2Fsourceforge.net%2Fprojects%2Fvirtualgl%2Ffiles%2F2.6.90%2520%25283.0beta1%2529%2Fvirtualgl_2.6.90_amd64.deb%2Fdownload%3Fuse_mirror%3Dmanagedway' -O virtualgl_2.6.90_amd64.deb && \
+    dpkg -i --force-depends virtualgl_2.6.90_amd64.deb && \
+    apt-get -f install -y && \
     rm -rf /tmp/*.deb
 
 # add some viz permissions for VirtualGL
