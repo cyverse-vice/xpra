@@ -10,8 +10,8 @@ RUN apt-get update \
     && curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | apt-key add -
 RUN apt-get update && \
     apt-get install -y wget gnupg2 && \
-    wget -O - http://winswitch.org/gpg.asc | apt-key add - && \
-    echo "deb http://winswitch.org/ bionic main" > /etc/apt/sources.list.d/xpra.list && \
+    wget -O - http://xpra.org/gpg.asc | apt-key add - && \
+    echo "deb http://xpra/ bionic main" > /etc/apt/sources.list.d/xpra.list && \
     apt-get update && \
     apt-get install -y xpra xvfb xterm && \
     apt-get clean && \ 
