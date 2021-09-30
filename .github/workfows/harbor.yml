@@ -82,5 +82,17 @@ jobs:
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache    
 
+      - name: Build and push Orange
+        id: docker_build_two_two_x
+        uses: docker/build-push-action@v2.6.1
+        with:
+          context: orange-20.04
+          file: orange/Dockerfile
+          builder: ${{ steps.buildx.outputs.name }}
+          push: true
+          tags: harbor.cyverse.org/vice/xpra/orange:20.04
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache 
+
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
