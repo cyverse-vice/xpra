@@ -35,7 +35,7 @@ jobs:
           password: ${{ secrets.HARBOR_PASSWORD }}
       
       - name: Build and push Desktop 20.04
-        id: docker_build_desktop_20.04
+        id: docker_build_desktop_twentyofour
         uses: docker/build-push-action@v2.6.1
         with:
           context: desktop-20.04 
@@ -47,7 +47,7 @@ jobs:
           cache-to: type=local,dest=/tmp/.buildx-cache
       
       - name: Build and push Desktop 18.04
-        id: docker_build_desktop_18.04
+        id: docker_build_desktop_eighteenofour
         uses: docker/build-push-action@v2.6.1
         with:
           context: desktop-18.04
@@ -59,7 +59,7 @@ jobs:
           cache-to: type=local,dest=/tmp/.buildx-cache
 
       - name: Build and push cudagl 20.04
-        id: docker_build_cudagl_20.04
+        id: docker_build_cudagl_twentyofour
         uses: docker/build-push-action@v2.6.1
         with:
           context: cudagl-20.04
@@ -71,7 +71,7 @@ jobs:
           cache-to: type=local,dest=/tmp/.buildx-cache
           
       - name: Build and push cudagl 18.04
-        id: docker_build_cudagl_18.04
+        id: docker_build_cudagl_eighteenofour
         uses: docker/build-push-action@v2.6.1
         with:
           context: cudagl-18.04
