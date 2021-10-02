@@ -1,6 +1,6 @@
 # Dockerfile modified to bionic from https://github.com/lanrat/docker-xpra-html5
 
-FROM nvidia/opengl:1.0-glvnd-runtime-ubuntu18.04
+FROM ubuntu:bionic
 
 MAINTAINER Tyson Lee Swetnam <tswetnam@cyverse.org>
 
