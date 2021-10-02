@@ -1,8 +1,20 @@
 # Dockerfile modified to bionic from https://github.com/lanrat/docker-xpra-html5
 
-FROM nvidia/opengl:1.0-glvnd-runtime-ubuntu18.04
+FROM ubuntu:bionic
 
-MAINTAINER Tyson Lee Swetnam <tswetnam@cyverse.org>
+# Build-time metadata as defined at http://label-schema.org
+ARG BUILD_DATE
+ARG VCS_REF
+ARG VERSION
+LABEL org.label-schema.build-date=$BUILD_DATE \
+    org.label-schema.name="CyVerse XPRA Desktop" \
+    org.label-schema.description="XPRA Remote Desktop, additional depends for CyVerse K8s workbench" \
+    org.label-schema.url="https://cyverse.org" \
+    org.label-schema.vcs-ref=$VCS_REF \
+    org.label-schema.vcs-url="e.g. https://github.com/cyverse-vice/xpra" \
+    org.label-schema.vendor="CyVerse" \
+    org.label-schema.version=$VERSION \
+    org.label-schema.schema-version="1.0.0"
 
 # install XPRA: https://xpra.org/trac/wiki/Usage/Docker 
 ENV DEBIAN_FRONTEND=noninteractive
