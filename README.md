@@ -13,13 +13,13 @@ Ubuntu container with Xpra for running remote desktop applications in browser.
 Image is built from NVIDIA Docker image and is compatible with GPUs - need to install additional software.
 
 ```
-docker run -it -p 9876:9876 tswetnam/xpra:bionic 
+docker run -it -p 9876:9876 harbor.cyverse.org/vice/xpra/desktop:20.04 
 ```
 
 With a new `ENTRYPOINT`:
 
 ```
-docker run -it -p 9876:9876 tswetnam/xpra:bionic xpra start --bind-tcp=0.0.0.0:9876 --html=on --start-child=xterm --exit-with-children --daemon=no
+docker run -it -p 9876:9876 harbor.cyverse.org/vice/xpra/desktop:20.04 xpra start --bind-tcp=0.0.0.0:9876 --html=on --start-child=xterm --exit-with-children --daemon=no
 ```
 
 #### Run with NVIDIA GPU
@@ -28,5 +28,5 @@ You need to have an [xorg]() server running prior to launching.
 
 ```
 export DISPLAY=:0
-docker run --gpus all --rm -it -p 9876:9876 -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY -e XAUTHORITY -e QT_X11_NO_MITSHM=1 -e NVIDIA_DRIVER_CAPABILITIES=all tswetnam/xpra:cudagl-18.04
+docker run --gpus all --rm -it -p 9876:9876 -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY -e XAUTHORITY -e QT_X11_NO_MITSHM=1 -e NVIDIA_DRIVER_CAPABILITIES=all harbor.cyverse.org/vice/xpra/cudagl:20.04
 ```
