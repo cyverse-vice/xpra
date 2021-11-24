@@ -38,23 +38,11 @@ jobs:
         id: docker_build_desktop_twentyofour
         uses: docker/build-push-action@v2.6.1
         with:
-          context: desktop-20.04 
+          context: desktop20.04 
           file: desktop/20.04/Dockerfile
           builder: ${{ steps.buildx.outputs.name }}
           push: true
           tags: harbor.cyverse.org/vice/xpra/desktop:20.04
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
-      
-      - name: Build and push Desktop 18.04
-        id: docker_build_desktop_eighteenofour
-        uses: docker/build-push-action@v2.6.1
-        with:
-          context: desktop-18.04
-          file: desktop/18.04/Dockerfile
-          builder: ${{ steps.buildx.outputs.name }}
-          push: true
-          tags: harbor.cyverse.org/vice/xpra/desktop:18.04
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
 
@@ -62,31 +50,19 @@ jobs:
         id: docker_build_cudagl_twentyofour
         uses: docker/build-push-action@v2.6.1
         with:
-          context: cudagl-20.04
+          context: cudagl20.04
           file: cudagl/20.04/Dockerfile
           builder: ${{ steps.buildx.outputs.name }}
           push: true
           tags: harbor.cyverse.org/vice/xpra/cudagl:20.04
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
-          
-      - name: Build and push cudagl 18.04
-        id: docker_build_cudagl_eighteenofour
-        uses: docker/build-push-action@v2.6.1
-        with:
-          context: cudagl-18.04
-          file: cudagl/18.04/Dockerfile
-          builder: ${{ steps.buildx.outputs.name }}
-          push: true
-          tags: harbor.cyverse.org/vice/xpra/cudagl:18.04
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache    
 
       - name: Build and push Orange
         id: docker_build_orange
         uses: docker/build-push-action@v2.6.1
         with:
-          context: orange-20.04
+          context: orange20.04
           file: orange/Dockerfile
           builder: ${{ steps.buildx.outputs.name }}
           push: true
