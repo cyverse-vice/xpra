@@ -38,7 +38,7 @@ jobs:
         id: docker_build_desktop_twentyofour
         uses: docker/build-push-action@v2.6.1
         with:
-          context: desktop20.04 
+          context: desktop
           file: desktop/20.04/Dockerfile
           builder: ${{ steps.buildx.outputs.name }}
           push: true
@@ -50,7 +50,7 @@ jobs:
         id: docker_build_cudagl_twentyofour
         uses: docker/build-push-action@v2.6.1
         with:
-          context: cudagl20.04
+          context: cudagl
           file: cudagl/20.04/Dockerfile
           builder: ${{ steps.buildx.outputs.name }}
           push: true
