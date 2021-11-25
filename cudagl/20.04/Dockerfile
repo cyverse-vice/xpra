@@ -1,92 +1,127 @@
 # Dockerfile modified to bionic from https://github.com/lanrat/docker-xpra-html5
-FROM nvcr.io/nvidia/cudagl:11.2.2-runtime-ubuntu20.04
-
-# Build-time metadata as defined at http://label-schema.org
-ARG BUILD_DATE
-ARG VCS_REF
-ARG VERSION
-LABEL org.label-schema.build-date=$BUILD_DATE \
-    org.label-schema.name="CyVerse XPRA CUDAGL" \
-    org.label-schema.description="XPRA Remote Desktop, additional depends for CyVerse K8s workbench" \
-    org.label-schema.url="https://cyverse.org" \
-    org.label-schema.vcs-ref=$VCS_REF \
-    org.label-schema.vcs-url="e.g. https://github.com/cyverse-vice/xpra" \
-    org.label-schema.vendor="CyVerse" \
-    org.label-schema.version=$VERSION \
-    org.label-schema.schema-version="1.0.0"
+FROM nvcr.io/nvidia/cudagl:11.2.0-runtime-ubuntu20.04
+MAINTAINER Tyson Lee Swetnam <tswetnam@cyverse.org>
 
 # install XPRA: https://xpra.org/trac/wiki/Usage/Docker 
 ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && \
+    apt-get install -y wget gnupg2 apt-transport-https ca-certificates 
 
-RUN apt update && \
-    apt install -y wget \
-    gnupg2 \ 
-    apt-transport-https \
-    ca-certificates
+RUN wget -O - http://winswitch.org/gpg.asc | apt-key add - && \
+    echo "deb http://winswitch.org/ focal main" > /etc/apt/sources.list.d/xpra.list
 
-RUN wget -q https://xpra.org/gpg.asc -O- | apt-key add - && \
+RUN apt-get update && \
+    wget -q https://xpra.org/gpg.asc -O- | apt-key add - && \
     echo "deb https://xpra.org/ focal main" >> /etc/apt/sources.list.d/xpra.list
 
-RUN apt update && \
-    apt install -y xpra \
+RUN apt-get update && \
+    apt-get install -y xpra xvfb xterm sshfs && \
+    apt-get clean && \ 
+    rm -rf /var/lib/apt/lists/*
+
+# Install new apps
+RUN apt-get update && \
+    apt-get install -y xpra \
     xvfb \
     xterm \
-    sshfs && \
+    sshfs \
+    software-properties-common \
+    firefox \
+    tasksel \
+    gnome-shell \ 
+    gnome-session \ 
+    gdm3 \
+    gnome-terminal \
+    wget \
+    bzip2 \
+    ca-certificates \
+    libglib2.0-0 \
+    libxext6 \
+    libsm6 \
+    libxrender1 \
+    git \
+    mercurial \
+    subversion && \
+    apt-get clean && \ 
+    rm -rf /var/lib/apt/lists/* && \
     apt-get clean && \ 
     rm -rf /var/lib/apt/lists/*
 
 RUN apt-key list
-    
-# Add sudo to user
-RUN adduser --disabled-password --gecos "VICE_User" --uid 1000 user
-RUN apt-get update && apt-get install -y sudo
-RUN usermod -aG sudo user
-RUN echo 'ALL ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
-
-# install all X apps here
+# Add limited sudo to the user
 RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive && \
-    apt-get clean && \ 
+    apt-get install -y sudo && \
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update && apt-get install -y apt-utils \
-    build-essential \
-    firefox \
-    gdm3 \
-    glances \
-    glmark2 \
-    gnome-shell \
-    gnome-session \
-    gnome-terminal \
-    htop \
-    libqt5x11extras5 \
-    linux-generic-hwe-18.04-edge \
-    nautilus \
-    seahorse-nautilus \
-    software-properties-common \
-    tasksel
+# define username as xpra
+ARG LOCAL_USER=user
+ARG PRIV_CMDS='/bin/ch*,/bin/cat,/bin/gunzip,/bin/tar,/bin/mkdir,/bin/ps,/bin/mv,/bin/cp,/usr/bin/apt*,/usr/bin/pip*,/bin/yum'
 
-RUN mkdir -p /run/user/1000/xpra
-RUN mkdir -p /run/xpra
-RUN chown user:user /run/user/1000/xpra
+RUN adduser --disabled-password --gecos "VICE_User" --uid 1000 user  && \
+    usermod -aG sudo user && \
+    echo "$LOCAL_USER ALL=NOPASSWD: $PRIV_CMDS" >> /etc/sudoers
+
+# Create user space for xpra user
+RUN mkdir -p /run/xpra/1000
 RUN chown -R user:user /run/xpra
+RUN mkdir -p /run/user/1000
 RUN chown -R user:user /run/user
 
-# Install CyberDuck CLI
-RUN echo "deb https://s3.amazonaws.com/repo.deb.cyberduck.io stable main" | tee /etc/apt/sources.list.d/cyberduck.list > /dev/null && \
-    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys FE7097963FEFBE72 && \
-    apt-get update && \
-    apt-get install duck
+# Install MiniConda and Tini
+ENV TZ America/Phoenix
+ENV LANG=C.UTF-8 
+ENV LC_ALL "en_US.UTF-8"
+ENV PATH /opt/conda/bin:$PATH
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
+    echo $TZ > /etc/timezone
 
-# Install Go
-RUN wget -c https://dl.google.com/go/go1.16.4.linux-amd64.tar.gz -O - | sudo tar -xz -C /usr/local
+RUN apt-get update && \
+    apt-get install -y wget bzip2 ca-certificates \
+    libglib2.0-0 libxext6 libsm6 libxrender1 \
+    git mercurial subversion \
+    tmux && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-# iRODS iCommands kludge
+RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh && \
+    /bin/bash ~/miniconda.sh -b -p /opt/conda && \
+    rm ~/miniconda.sh && \
+    ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh && \
+    echo ". /opt/conda/etc/profile.d/conda.sh" >> /home/user/.bashrc && \
+    echo ". /opt/conda/etc/profile.d/conda.sh" >> /home/user/.zshrc && \
+    chown -R user:user /opt/conda
+
+RUN apt-get update && \
+    apt-get install -y curl grep sed dpkg && \
+    TINI_VERSION=`curl https://github.com/krallin/tini/releases/latest | grep -o "/v.*\"" | sed 's:^..\(.*\).$:\1:'` && \
+    curl -L "https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini_${TINI_VERSION}.deb" > tini.deb && \
+    dpkg -i tini.deb && \
+    rm tini.deb && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install a few dependencies for iCommands, text editing, and monitoring instances
+RUN apt-get update && \
+    apt-get install -y lsb-release apt-transport-https curl gnupg2 libfuse2 gcc less nodejs software-properties-common apt-utils glances htop nano  && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update && \
+    apt-get install -y vim-nox && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update && \
+    apt-get install -y emacs-nox && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
 RUN wget -qO - https://packages.irods.org/irods-signing-key.asc | apt-key add - && \
-    echo "deb [arch=amd64] https://packages.irods.org/apt/ bionic  main" > /etc/apt/sources.list.d/renci-irods.list && \
+    echo "deb [arch=amd64] https://packages.irods.org/apt/ bionic main" > /etc/apt/sources.list.d/renci-irods.list && \
     apt-get update && \
-    wget -c \
+    wget -q -c \
     http://security.ubuntu.com/ubuntu/pool/main/p/python-urllib3/python-urllib3_1.22-1ubuntu0.18.04.2_all.deb \
     http://security.ubuntu.com/ubuntu/pool/main/r/requests/python-requests_2.18.4-2ubuntu0.1_all.deb \
     http://security.ubuntu.com/ubuntu/pool/main/o/openssl1.0/libssl1.0.0_1.0.2n-1ubuntu5.7_amd64.deb && \
@@ -97,79 +132,66 @@ RUN wget -qO - https://packages.irods.org/irods-signing-key.asc | apt-key add - 
     rm -rf \
     ./python-urllib3_1.22-1ubuntu0.18.04.2_all.deb \
     ./python-requests_2.18.4-2ubuntu0.1_all.deb \
-    ./libssl1.0.0_1.0.2n-1ubuntu5.7_amd64.deb
+    ./libssl1.0.0_1.0.2n-1ubuntu5.7_amd64.deb && \
+    apt install -y irods-icommands && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-RUN apt install -y irods-icommands
+# Install Go
+RUN wget -q -c https://dl.google.com/go/go1.16.4.linux-amd64.tar.gz -O - | sudo tar -xz -C /usr/local
 
-# Install VirtualGL for testing
+# install ttyd
+RUN curl -L "https://github.com/tsl0922/ttyd/releases/download/1.6.3/ttyd.x86_64" > ttyd && \
+    chmod a+x ttyd && \
+    mv ttyd /usr/local/bin/ttyd
 
-RUN apt install -y libegl1-mesa
+# Install ZSH shell
+RUN apt-get update && \
+    apt-get install -y zsh && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-RUN cd /tmp && wget 'https://downloads.sourceforge.net/project/virtualgl/2.6.90%20%283.0beta1%29/virtualgl_2.6.90_amd64.deb?ts=gAAAAABhVh46kFWwxLZvYTh02FoHGu9ypAsXEJxwq0dG9tju2u9eoLrfnaau7zmHdY_7TBUucTh-ZNKGG_2FBUyQfQzH5Jscxw%3D%3D&use_mirror=managedway&r=https%3A%2F%2Fsourceforge.net%2Fprojects%2Fvirtualgl%2Ffiles%2F2.6.90%2520%25283.0beta1%2529%2Fvirtualgl_2.6.90_amd64.deb%2Fdownload%3Fuse_mirror%3Dmanagedway' -O virtualgl_2.6.90_amd64.deb && \
-    dpkg -i --force-depends virtualgl_2.6.90_amd64.deb && \
-    apt-get -f install -y && \
-    rm -rf /tmp/*.deb
+# getting locales error
+RUN apt-get clean && apt-get update && apt-get install locales && locale-gen en_US.UTF-8
 
-# add some viz permissions for VirtualGL
-RUN chown -R user:user /run/user
-RUN apt-get update && apt-get install -y libxcb-xinerama0
+# update terminal message
+RUN apt-get update && apt install neofetch figlet lolcat cowsay fortune -y
+ENV PATH=${PATH}:/usr/games
+COPY 01-custom /etc/motd
+RUN chmod +x /etc/motd
 
-RUN apt-get install -y language-pack-en-base && \ 
-    locale-gen en_US.UTF-8 && \ 
-    update-locale LANG=en_US.UTF-8
+# Install CyberDuck CLI
+RUN echo "deb https://s3.amazonaws.com/repo.deb.cyberduck.io stable main" > /etc/apt/sources.list.d/cyberduck.list && \
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys FE7097963FEFBE72 && \
+    apt-get update && \
+    apt-get install  duck
 
-RUN echo LANG="en_US.UTF-8" > /etc/default/locale
-RUN echo en_US.UTF-8 UTF-8 >> /etc/locale.gen && locale-gen
-
-ENV TZ America/Phoenix
-ENV LC_ALL "en_US.UTF-8"
-
-# Install MiniConda and Tini
-
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
-    echo $TZ > /etc/timezone
-
-ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
-ENV PATH /opt/conda/bin:$PATH
-
-RUN apt-get update --fix-missing && apt-get install -y wget bzip2 ca-certificates \
-    libglib2.0-0 libxext6 libsm6 libxrender1 \
-    git mercurial subversion
-
-RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh && \
-    /bin/bash ~/miniconda.sh -b -p /opt/conda && \
-    rm ~/miniconda.sh && \
-    ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh && \
-    echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc && \
-    echo "conda activate base" >> ~/.bashrc
-
-RUN apt-get install -y curl grep sed dpkg && \
-    TINI_VERSION=`curl https://github.com/krallin/tini/releases/latest | grep -o "/v.*\"" | sed 's:^..\(.*\).$:\1:'` && \
-    curl -L "https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini_${TINI_VERSION}.deb" > tini.deb && \
-    dpkg -i tini.deb && \
-    rm tini.deb && \
-    apt-get clean
-
-RUN chown -R user:user /opt/conda
-
+# ready to set user 
 USER user
 
-RUN echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc && \
-    echo "conda activate base" >> ~/.bashrc
+# Install OhMyZSH theme
+RUN sh -c "$(wget -O- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+RUN echo '[ ! -z "$TERM" -a -r /etc/motd ] && /etc/motd' >> ~/.zshrc
+ENV source ~/.zshrc
 
-# add iRODS iCommands to user profile as JSON
-RUN mkdir /home/user/.irods && echo '{"irods_host": "data.cyverse.org", "irods_port": 1247, "irods_user_name": "$IPLANT_USER", "irods_zone_name": "iplant"}' | tee  > /home/user/.irods/irods_environment.json
+# set path for Go
+ENV PATH=$PATH:/usr/local/go/bin 
 
-# Set some environment stuff
-ENV NVIDIA_VISIBLE_DEVICES all
-ENV NVIDIA_DRIVER_CAPABILITIES graphics,utility,compute
-
-ENV PATH=$PATH:/opt/VirtualGL/bin/:/usr/local/go/bin 
+# set shell as zsh
+ENV SHELL=zsh
+ENV TERM=linux
 
 ENV DISPLAY=:100
 
-WORKDIR /home/user
-VOLUME /tmp/.X11-unix
+WORKDIR /home/${LOCAL_USER}
+
 EXPOSE 9876
 
-CMD xpra start --bind-tcp=0.0.0.0:9876 --html=on --start-child=gnome-terminal --exit-with-children=no --daemon=no --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 1920x1080x24+32 -nolisten tcp -noreset" --pulseaudio=no --notifications=no --bell=no :100
+# changes tmux layout while running
+COPY entry.sh /bin
+RUN echo 'set-option -g status off' >> ~/.tmux.conf
+
+# add iRODS iCommands to user profile as JSON
+RUN mkdir /home/user/.irods 
+
+ENTRYPOINT ["zsh", "/bin/entry.sh"]
