@@ -2,7 +2,7 @@
 
 # Xpra w/ Miniconda
 
-![GitHub commits since tagged version](https://img.shields.io/github/commits-since/cyverse-vice/xpra/latest/main?style=flat-square)
+![GitHub commits since tagged version](https://img.shields.io/github/commits-since/cyverse-vice/xpra/latest/main?style=flat-square) [![harbor](https://github.com/cyverse-vice/xpra/actions/workflows/harbor.yml/badge.svg)](https://github.com/cyverse-vice/xpra/actions/workflows/harbor.yml)
 
 image            | description                               | size   | 
 ---------------- | ----------------------------------------- | ------ | 
