@@ -1,0 +1,10 @@
+name: orange
+channels:
+  - conda-forge
+  - anaconda
+  - defaults
+dependencies:
+  - python=3.8.*
+  - orange3
+  - pyqt=5 
+  - qt

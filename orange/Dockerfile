@@ -4,13 +4,7 @@ USER root
 
 # Install Python and linux depends
 RUN apt-get update \
-    && apt-get install -y bzip2 g++ virtualenv build-essential \
-    git software-properties-common sudo 
-
-# Install Orange3
-RUN conda install orange3
-RUN conda install -c defaults pyqt=5 qt
-
+    && apt-get install -y g++ virtualenv build-essential 
 
 # Create Orange user
 ENV USER orange
@@ -25,7 +19,29 @@ ADD ./icons/orange.png .conda/share/orange3/orange.png
 ADD ./orange/orange-canvas.desktop Desktop/orange-canvas.desktop
 
 USER orange
+
+# Install Orange3
+COPY environment.yml environment.yml
+RUN conda env create -f environment.yml
+
+ENV conda init 
+ENV conda activate orange
+
 WORKDIR /home/orange
 
-# Start Orange
-CMD xpra start --bind-tcp=0.0.0.0:9876 --html=on --start-child="python3 -m Orange.canvas"  --exit-with-children=no --daemon=no --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 1920x1080x24+32 -nolisten tcp -noreset" --file-transfer=on --pulseaudio=no --notifications=no --bell=no :100
+# set shell as zsh
+ENV SHELL=zsh
+ENV TERM=linux
+
+ENV DISPLAY=:100
+
+EXPOSE 9876
+
+# changes tmux layout while running
+COPY entry.sh /bin
+RUN echo 'set-option -g status off' >> ~/.tmux.conf
+
+# add iRODS iCommands to user profile as JSON
+RUN mkdir /home/orange/.irods 
+
+ENTRYPOINT ["zsh", "/bin/entry.sh"]
