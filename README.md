@@ -1,14 +1,16 @@
-[![Project Supported by CyVerse](https://img.shields.io/badge/Supported%20by-CyVerse-blue.svg)](https://learning.cyverse.org/projects/vice/en/latest/) [![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5750698.svg)](https://doi.org/10.5281/zenodo.5750698) [![license](https://img.shields.io/badge/license-GPLv3-blue.svg?style=flat-square)](https://opensource.org/licenses/GPL-3.0) ![GitHub all releases](https://img.shields.io/github/downloads/cyverse-vice/xpra/total?style=flat-square)
+[![Project Supported by CyVerse](https://de.cyverse.org/Powered-By-CyVerse-blue.svg)](https://learning.cyverse.org/projects/vice/en/latest/) [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5750698.svg)](https://doi.org/10.5281/zenodo.5750698) [![license](https://img.shields.io/badge/license-GPLv3-blue.svg?style=flat-square)](https://opensource.org/licenses/GPL-3.0) ![GitHub all releases](https://img.shields.io/github/downloads/cyverse-vice/xpra/total?style=flat-square)
 
 # Xpra w/ Miniconda
 
-![GitHub commits since tagged version](https://img.shields.io/github/commits-since/cyverse-vice/xpra/latest/main?style=flat-square) [![harbor](https://github.com/cyverse-vice/xpra/actions/workflows/harbor.yml/badge.svg)](https://github.com/cyverse-vice/xpra/actions/workflows/harbor.yml)
+[Xpra](https://xpra.org) remote desktops built on Ubuntu with and without NVIDIA OpenGL.
 
-image            | description                               | size   | 
----------------- | ----------------------------------------- | ------ | 
-<a href="" target="_blank"><img src="https://de.cyverse.org/Powered-By-CyVerse-blue.svg"></a> | [![TAG](https://img.shields.io/docker/v/cyversevice/xpra/latest.svg)](https://img.shields.io/docker/v/cyversevice/xpra/latest) | [![SIZE](https://img.shields.io/docker/image-size/cyversevice/xpra/latest.svg)](https://img.shields.io/docker/image-size/cyversevice/xpra/latest) 
-<a href="" target="_blank"><img src="https://de.cyverse.org/Powered-By-CyVerse-blue.svg"></a> | [![TAG](https://img.shields.io/docker/v/cyversevice/xpra/20.04.svg)](https://img.shields.io/docker/v/cyversevice/xpra/20.04) | [![SIZE](https://img.shields.io/docker/image-size/cyversevice/xpra/20.04.svg)](https://img.shields.io/docker/image-size/cyversevice/xpra/20.04)
-<a href="" target="_blank"><img src="https://de.cyverse.org/Powered-By-CyVerse-blue.svg"></a> | [![TAG](https://img.shields.io/docker/v/cyversevice/xpra/cudagl-20.04.svg)](https://img.shields.io/docker/v/cyversevice/xpra/cudagl-20.04) | [![SIZE](https://img.shields.io/docker/image-size/cyversevice/xpra/cudagl-20.04.svg)](https://img.shields.io/docker/image-size/cyversevice/xpra/cudagl-20.04) 
+![GitHub commits since tagged version](https://img.shields.io/github/commits-since/cyverse-vice/xpra/latest/main?style=flat-square) [![harbor]
+(https://github.com/cyverse-vice/xpra/actions/workflows/harbor.yml/badge.svg)](https://github.com/cyverse-vice/xpra/actions/workflows/harbor.yml)
+
+
+| quick launch | 
+|--------------|
+| <a href="https://de.cyverse.org/apps/de/f3f8cc78-23d5-11ec-abcf-008cfa5ae621/launch" target="_blank"><img src="https://img.shields.io/badge/Xpra-Geospatial-green?style=plastic&logo=ubuntu"></a> |
 
 # Docker
 
@@ -26,9 +28,9 @@ With a new `ENTRYPOINT`:
 docker run -it -p 9876:9876 harbor.cyverse.org/vice/xpra/desktop:20.04 xpra start --bind-tcp=0.0.0.0:9876 --html=on --start-child=xterm --exit-with-children --daemon=no
 ```
 
-#### Run with NVIDIA GPU for CUDA
+#### Run with NVIDIA GPU for CUDA OpenGL
 
-You need to have an [xorg]() server running prior to launching. 
+You need to start a [Xorg Server](https://www.x.org/wiki/) prior to launching the Xpra container: 
 
 ```
 export DISPLAY=:0
