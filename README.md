@@ -10,7 +10,7 @@
 
 | quick launch | 
 |--------------|
-| <a href="https://de.cyverse.org/apps/de/f3f8cc78-23d5-11ec-abcf-008cfa5ae621/launch" target="_blank"><img src="https://img.shields.io/badge/Xpra-Geospatial-green?style=plastic&logo=ubuntu"></a> |
+| <a href="https://de.cyverse.org/apps/de/f3f8cc78-23d5-11ec-abcf-008cfa5ae621/launch" target="_blank"><img src="https://img.shields.io/badge/Xpra-Geospatial-orange?style=plastic&logo=X.Org"></a> |
 
 # Docker
 
