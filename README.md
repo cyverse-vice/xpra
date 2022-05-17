@@ -4,8 +4,7 @@
 
 [Xpra](https://xpra.org) remote desktops built on Ubuntu with and without NVIDIA OpenGL.
 
-![GitHub commits since tagged version](https://img.shields.io/github/commits-since/cyverse-vice/xpra/latest/main?style=flat-square) [![harbor]
-(https://github.com/cyverse-vice/xpra/actions/workflows/harbor.yml/badge.svg)](https://github.com/cyverse-vice/xpra/actions/workflows/harbor.yml)
+![GitHub commits since tagged version](https://img.shields.io/github/commits-since/cyverse-vice/xpra/latest/main?style=flat-square) [![harbor](https://github.com/cyverse-vice/xpra/actions/workflows/harbor.yml/badge.svg)](https://github.com/cyverse-vice/xpra/actions/workflows/harbor.yml)
 
 
 | quick launch | 
