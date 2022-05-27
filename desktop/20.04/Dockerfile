@@ -41,8 +41,10 @@ RUN apt update && \
     lsb-release \
     mercurial \
     mesa-utils \
+    nautilus \
     neofetch \
     nodejs \
+    seahorse-nautilus \
     sed \
     software-properties-common \
     subversion \
