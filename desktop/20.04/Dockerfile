@@ -1,7 +1,7 @@
 # Dockerfile modified from https://github.com/lanrat/docker-xpra-html5
 # Using NVIDIA OpenGL base image for Ubuntu 20.04 
 # This image does not have CUDA pre-installed
-FROM nvidia/opengl:1.0-glvnd-runtime-ubuntu20.04
+FROM nvidia/opengl:1.2-glvnd-runtime-ubuntu20.04
 
 LABEL Author "Tyson Lee Swetnam"
 LABEL Contact "tswetnam@cyverse.org"
@@ -71,8 +71,8 @@ RUN wget -O - http://winswitch.org/gpg.asc | apt-key add - &&  echo "deb http://
 
 # Install VirtualGL
 RUN cd /tmp && \
-    wget https://sourceforge.net/projects/virtualgl/files/3.0.1/virtualgl_3.0.1_amd64.deb/download -O virtualgl_3.0.1_amd64.deb && \
-    dpkg -i --force-depends virtualgl_3.0.1_amd64.deb && \
+    wget https://sourceforge.net/projects/virtualgl/files/3.0.2/virtualgl_3.0.2_amd64.deb/download -O virtualgl_3.0.2_amd64.deb && \
+    dpkg -i --force-depends virtualgl_3.0.2_amd64.deb && \
     apt -f install -y 
 
 # Create XAuthority configurations
