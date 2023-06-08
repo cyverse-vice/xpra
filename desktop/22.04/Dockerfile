@@ -9,26 +9,31 @@ LABEL Contact "tswetnam@cyverse.org"
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install basics, gnome desktop, benchmarks
-RUN apt update && \
-    apt install -y \
+RUN apt-get update 
+RUN apt-get install -y \
     apt-transport-https \
-    apt-utils \   
-    bzip2 \
     ca-certificates \
     curl \
     dpkg \
-    emacs-nox \
     figlet \
-    firefox \
     gcc \
     gdm3 \    
     git \
     glances \
     glmark2 \
+    sed \
+    software-properties-common \
+    sudo \
+    wget \
+    xterm \
+    xvfb 
+
+RUN apt-get update && \
+    apt-get install -y \
     gnome-shell \ 
     gnome-session \ 
     gnome-terminal \
-    gnupg2 \
+    gpgv \
     grep \
     htop \
     less \
@@ -45,16 +50,9 @@ RUN apt update && \
     neofetch \
     nodejs \
     seahorse-nautilus \
-    sed \
-    software-properties-common \
     subversion \
-    sudo \
     tasksel \
     tmux \
-    vim-nox \
-    wget \
-    xterm \
-    xvfb \
     zsh \
     && \
     apt-get clean && \ 
@@ -62,20 +60,16 @@ RUN apt update && \
     apt-get clean && \ 
     rm -rf /var/lib/apt/lists/*
 
-# install Microsoft Edge
-RUN curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg && \
-    install -o root -g root -m 644 microsoft.gpg /etc/apt/trusted.gpg.d/ && \
-    sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/edge stable main" > /etc/apt/sources.list.d/microsoft-edge-dev.list' && \
-    rm microsoft.gpg && \
-    apt update -y && \
-    apt install -y microsoft-edge-stable
+# install XPRA: https://github.com/Xpra-org/xpra/wiki/Download#-linux
+RUN curl -O https://xpra.org/gpg.asc && \
+    gpg --no-default-keyring --keyring=./xpra-v1.gpg --import ./gpg.asc && \
+    gpg --no-default-keyring --keyring=./xpra-v1.gpg --export > xpra.gpg && \
+    mv xpra.gpg /etc/apt/trusted.gpg.d/
 
-# install XPRA: https://xpra.org/trac/wiki/Usage/Docker 
-RUN wget -O - http://winswitch.org/gpg.asc | apt-key add - &&  echo "deb http://winswitch.org/ focal main" > /etc/apt/sources.list.d/xpra.list && \
-    wget -q https://xpra.org/gpg.asc -O- | apt-key add - &&  \
-    echo "deb https://xpra.org/ focal main" >> /etc/apt/sources.list.d/xpra.list && \
-    apt update && \
-    apt install xpra -y
+RUN wget -O "/usr/share/keyrings/xpra.asc" https://xpra.org/xpra.asc && \
+    wget -O "/etc/apt/sources.list.d/xpra.sources" https://xpra.org/repos/jammy/xpra.sources && \
+    apt-get update --allow-insecure-repositories --allow-unauthenticated -y && \
+    apt-get install xpra --allow-unauthenticated -y
 
 # Install VirtualGL
 RUN cd /tmp && \
@@ -90,9 +84,9 @@ RUN export XAUTHORITY=~/.Xauthority && \
     wget https://gist.githubusercontent.com/tyson-swetnam/3490dc02476818a67a3bcdcba3017678/raw/66885bbfa54a406ce486484a79ece237028c5ee7/xorg.conf -O /etc/X11/xorg.conf
    
 # define username as ubuntu and limit its ownership
-ARG LOCAL_USER=ubuntu
+ARG LOCAL_USER=user
 
-ARG PRIV_CMDS='/bin/ch*,/bin/cat,/bin/gunzip,/bin/tar,/bin/mkdir,/bin/ps,/bin/mv,/bin/cp,/usr/bin/apt*,/usr/bin/pip*,/bin/yum'
+ARG PRIV_CMDS='/bin/ch*,/bin/cat,/bin/gunzip,/bin/tar,/bin/mkdir,/bin/ps,/bin/mv,/bin/cp,/usr/bin/apt*,/usr/bin/pip*,/bin/yum,/bin/snap'
 
 RUN adduser --disabled-password --gecos "ubuntu" --uid 1000 ${LOCAL_USER}  && \
     usermod -aG sudo ${LOCAL_USER} && \
@@ -120,24 +114,26 @@ RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86
     echo ". /opt/conda/etc/profile.d/conda.sh" >> /home/${LOCAL_USER}/.zshrc && \
     chown -R ${LOCAL_USER}:${LOCAL_USER} /opt/conda
 
-ENV TINI_VERSION 0.19.0
-RUN apt-get update && \
-    curl -L "https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini_${TINI_VERSION}-amd64.deb" > tini.deb && \
-    dpkg -i tini.deb && \
-    rm tini.deb && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+# ENV TINI_VERSION 0.19.0
+# RUN apt-get update && \
+#    curl -L "https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini_${TINI_VERSION}-amd64.deb" > tini.deb && \
+#    dpkg -i tini.deb && \
+#    rm tini.deb && \
+#    apt-get clean && \
+#    rm -rf /var/lib/apt/lists/*
 
 # Install Go
-RUN wget -q -c https://dl.google.com/go/go1.16.4.linux-amd64.tar.gz -O - | tar -xz -C /usr/local
+RUN wget -q -c https://dl.google.com/go/go1.20.5.linux-amd64.tar.gz -O - | tar -xz -C /usr/local
 
 # install ttyd
-RUN curl -L "https://github.com/tsl0922/ttyd/releases/download/1.6.3/ttyd.x86_64" > ttyd && \
+RUN curl -L "https://github.com/tsl0922/ttyd/releases/download/1.7.3/ttyd.x86_64" > ttyd && \
     chmod a+x ttyd && \
     mv ttyd /usr/local/bin/ttyd
 
 # getting a locales error
-RUN apt-get clean && apt-get update && apt-get install locales && locale-gen en_US.UTF-8
+RUN apt-get clean && \
+    apt-get install locales -y && \
+    locale-gen en_US.UTF-8
 
 # update terminal message
 ENV PATH=${PATH}:/usr/games
@@ -159,6 +155,12 @@ RUN chmod +x /etc/motd
 # Install GoCommmands
 RUN cd /usr/local/bin/ && \
     GOCMD_VER=$(curl -L -s https://raw.githubusercontent.com/cyverse/gocommands/main/VERSION.txt); curl -L -s https://github.com/cyverse/gocommands/releases/download/${GOCMD_VER}/gocmd-${GOCMD_VER}-linux-amd64.tar.gz | tar zxvf -
+
+# Install Firefox
+RUN add-apt-repository ppa:mozillateam/ppa && \
+    echo 'Package: * \ Pin: release o=LP-PPA-mozillateam \ Pin-Priority: 1001' | tee /etc/apt/preferences.d/mozilla-firefox && \
+    echo 'Unattended-Upgrade::Allowed-Origins:: "LP-PPA-mozillateam:${distro_codename}";' | sudo tee /etc/apt/apt.conf.d/51unattended-upgrades-firefox && \
+    apt-get install firefox -y
 
 # ready to set user 
 USER ${LOCAL_USER}
