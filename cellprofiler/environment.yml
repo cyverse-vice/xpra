@@ -26,3 +26,4 @@ dependencies:
 - pip:
     - cellprofiler==4.2.4
     - cellpose==2.1.0
+    - cellpose[gui]
