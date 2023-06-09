@@ -50,7 +50,7 @@ RUN cd && \
     echo "source activate cellprofiler" >> ~/.bashrc && \
     /bin/bash -c "source activate cellprofiler"
 
-# add `cellprofiler` and `imagej` to Gnome Applications Menu
+# add `cellprofiler` `cellpose` and `imagej` to Gnome Applications Menu
 RUN mkdir -p ~/.local/share/applications && \
     echo "[Desktop Entry]" >> ~/.local/share/applications/cellprofiler.desktop && \
     echo "Name=CellProfiler" >> ~/.local/share/applications/cellprofiler.desktop && \
@@ -65,7 +65,14 @@ RUN mkdir -p ~/.local/share/applications && \
     echo "Icon=" >> ~/.local/share/applications/imagej.desktop && \
     echo "Type=Application" >> ~/.local/share/applications/imagej.desktop && \
     echo "Categories=Application;Development;" >> ~/.local/share/applications/imagej.desktop && \
-    echo "Terminal=false" >> ~/.local/share/applications/imagej.desktop
+    echo "Terminal=false" >> ~/.local/share/applications/imagej.desktop && \
+    echo "[Desktop Entry]" >> ~/.local/share/applications/cellpose.desktop && \
+    echo "Name=CellPose" >> ~/.local/share/applications/cellpose.desktop && \
+    echo "Exec=/bin/bash -c 'source activate cellprofiler && cellpose'" >> ~/.local/share/applications/cellpose.desktop && \
+    echo "Icon=" >> ~/.local/share/applications/cellpose.desktop && \
+    echo "Type=Application" >> ~/.local/share/applications/cellpose.desktop && \
+    echo "Categories=Application;Development;" >> ~/.local/share/applications/cellpose.desktop && \
+    echo "Terminal=false" >> ~/.local/share/applications/cellpose.desktop
 
 # Install CellProfiler Plugins
 RUN cd && \
