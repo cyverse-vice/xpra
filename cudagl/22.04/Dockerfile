@@ -1,7 +1,5 @@
-# Dockerfile modified from https://github.com/lanrat/docker-xpra-html5
-# Using NVIDIA OpenGL base image for Ubuntu 22.04 
-# This image does not have CUDA pre-installed
-FROM nvidia/opengl:1.2-glvnd-runtime-ubuntu22.04
+# Dockerfile modified to bionic from https://github.com/lanrat/docker-xpra-html5
+FROM nvcr.io/nvidia/cuda:12.1.1-runtime-ubuntu22.04
 
 LABEL Author "Tyson Lee Swetnam"
 LABEL Contact "tswetnam@cyverse.org"
@@ -30,6 +28,7 @@ RUN apt-get install -y \
 
 RUN apt-get update && \
     apt-get install -y \
+    freeglut3-dev \ # opengl
     gnome-shell \ 
     gnome-session \ 
     gnome-terminal \
@@ -61,7 +60,6 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # install XPRA: https://github.com/Xpra-org/xpra/wiki/Download#-linux
-
 RUN wget -q https://xpra.org/gpg.asc -O- | apt-key add - &&  \
     echo "deb https://xpra.org/ jammy main" >> /etc/apt/sources.list.d/xpra.list && \
     apt update && \

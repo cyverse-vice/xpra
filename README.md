@@ -18,13 +18,19 @@ Ubuntu container with Xpra OpenGL and CUDA for running remote desktop applicatio
 Image is built from NVIDIA Docker image and is compatible with GPUs - need to install additional software.
 
 ```
-docker run -it -p 9876:9876 harbor.cyverse.org/vice/xpra/desktop:20.04 
+docker run -it -p 9876:9876 harbor.cyverse.org/vice/xpra/desktop:22.04 
+```
+
+may need to add: 
+ 
+```
+docker run -it -p 9876:9876 --security-opt seccomp=unconfined harbor.cyverse.org/vice/xpra/desktop:22.04 
 ```
 
 With a new `ENTRYPOINT`:
 
 ```
-docker run -it -p 9876:9876 harbor.cyverse.org/vice/xpra/desktop:20.04 xpra start --bind-tcp=0.0.0.0:9876 --html=on --start-child=xterm --exit-with-children --daemon=no
+docker run -it -p 9876:9876 --security-opt seccomp=unconfined harbor.cyverse.org/vice/xpra/desktop:22.04 xpra start --bind-tcp=0.0.0.0:9876 --html=on --start-child=xterm --exit-with-children --daemon=no
 ```
 
 #### Run with NVIDIA GPU for CUDA OpenGL
@@ -34,5 +40,5 @@ You need to start a [Xorg Server](https://www.x.org/wiki/) prior to launching th
 ```
 export DISPLAY=:0
 xinit &
-docker run --gpus all --rm -it -p 9876:9876 -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY -e XAUTHORITY -e QT_X11_NO_MITSHM=1 -e NVIDIA_DRIVER_CAPABILITIES=all harbor.cyverse.org/vice/xpra/cudagl:20.04
+docker run --gpus all --rm -it -p 9876:9876 -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY -e XAUTHORITY -e QT_X11_NO_MITSHM=1 -e NVIDIA_DRIVER_CAPABILITIES=all harbor.cyverse.org/vice/xpra/desktop:22.04
 ```
