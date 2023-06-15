@@ -28,7 +28,7 @@ RUN apt-get install -y \
 
 RUN apt-get update && \
     apt-get install -y \
-    freeglut3-dev \ # opengl
+    freeglut3-dev \
     gnome-shell \ 
     gnome-session \ 
     gnome-terminal \
@@ -74,7 +74,7 @@ RUN cd /tmp && \
 # Create XAuthority configurations
 RUN export XAUTHORITY=~/.Xauthority && \
     sed -i -e "s/console/anybody/" /etc/X11/Xwrapper.config && \
-#    nvidia-xconfig -a --allow-empty-initial-configuration --enable-all-gpus --use-display-device=none --virtual=1920x1080 -o /etc/X11/xorg.conf --busid=0:6:0 && \
+    # nvidia-xconfig -a --allow-empty-initial-configuration --enable-all-gpus --use-display-device=none --virtual=1920x1080 -o /etc/X11/xorg.conf --busid=0:6:0 && \
     wget https://gist.githubusercontent.com/tyson-swetnam/3490dc02476818a67a3bcdcba3017678/raw/66885bbfa54a406ce486484a79ece237028c5ee7/xorg.conf -O /etc/X11/xorg.conf
    
 # define username as ubuntu and limit its ownership
