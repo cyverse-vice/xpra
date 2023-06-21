@@ -152,11 +152,28 @@ RUN chmod +x /etc/motd
 RUN cd /usr/local/bin/ && \
     GOCMD_VER=$(curl -L -s https://raw.githubusercontent.com/cyverse/gocommands/main/VERSION.txt); curl -L -s https://github.com/cyverse/gocommands/releases/download/${GOCMD_VER}/gocmd-${GOCMD_VER}-linux-amd64.tar.gz | tar zxvf -
 
-# Install Firefox
-RUN add-apt-repository ppa:mozillateam/ppa && \
-    echo 'Package: * \ Pin: release o=LP-PPA-mozillateam \ Pin-Priority: 1001' | tee /etc/apt/preferences.d/mozilla-firefox && \
-    echo 'Unattended-Upgrade::Allowed-Origins:: "LP-PPA-mozillateam:${distro_codename}";' | sudo tee /etc/apt/apt.conf.d/51unattended-upgrades-firefox && \
-    apt-get install firefox -y
+
+# Remove the Firefox Snap
+RUN sudo apt-get remove -y firefox
+
+# Add the Mozilla team PPA to your list of software sources
+RUN sudo add-apt-repository -y ppa:mozillateam/ppa
+
+# Alter the Firefox package priority to ensure the PPA/deb/apt version of Firefox is preferred
+RUN echo '\n\
+Package: *\n\
+Pin: release o=LP-PPA-mozillateam\n\
+Pin-Priority: 1001\n\
+' | sudo tee /etc/apt/preferences.d/mozilla-firefox
+
+# Ensure future Firefox upgrades will be installed automatically
+RUN echo 'Unattended-Upgrade::Allowed-Origins:: "LP-PPA-mozillateam:${distro_codename}";' | sudo tee /etc/apt/apt.conf.d/51unattended-upgrades-firefox
+
+# Finally, install Firefox via apt
+RUN sudo apt-get update && sudo apt-get install -y firefox
+
+# Switch back to dialog for any ad-hoc use of apt-get
+ENV DEBIAN_FRONTEND=dialog
 
 # ready to set user 
 USER ${LOCAL_USER}
@@ -168,10 +185,13 @@ RUN echo '[ ! -z "$TERM" -a -r /etc/motd ] && /etc/motd' >> ~/.zshrc
 # set path for Go and VirtualGL
 ENV PATH=${PATH}:/usr/local/go/bin:/opt/VirtualGL/bin
 
-# set shell as zsh
-ENV SHELL=zsh
+# set shell as bash
+ENV SHELL=bash
 ENV TERM=linux
 ENV DISPLAY=:100
+
+# create ~/data-store for CSI driver fuse mount
+RUN mkdir /home/user/data-store
 
 WORKDIR /home/${LOCAL_USER}
 
@@ -182,4 +202,4 @@ EXPOSE 9876
 COPY entry.sh /bin
 RUN echo 'set-option -g status off' >> ~/.tmux.conf
 
-ENTRYPOINT ["zsh", "/bin/entry.sh"]
+ENTRYPOINT ["bash", "/bin/entry.sh"]

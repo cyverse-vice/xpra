@@ -81,4 +81,4 @@ RUN cd && \
 # changes tmux layout while running
 COPY entry.sh /bin
 RUN echo 'set-option -g status off' >> ~/.tmux.conf
-ENTRYPOINT ["zsh", "/bin/entry.sh"]
+ENTRYPOINT ["bash", "/bin/entry.sh"]
