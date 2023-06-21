@@ -128,13 +128,9 @@ ENV TZ America/Phoenix
 RUN apt install -y saga
 
 # Install QGIS Desktop binary
+RUN apt install gnupg software-properties-common -y
 
-RUN wget -qO - https://qgis.org/downloads/qgis-2023.gpg.key | gpg --no-default-keyring --keyring gnupg-ring:/etc/apt/trusted.gpg.d/qgis-archive.gpg --import && \
-        chmod a+r /etc/apt/trusted.gpg.d/qgis-archive.gpg
-
-RUN apt -y update && apt -f install && \
-        echo "deb [ arch=amd64 ] https://qgis.org/ubuntu jammy main" >> /etc/apt/sources.list && \
-        echo "deb-src [ arch=amd64 ] https://qgis.org/ubuntu jammy main" >> /etc/apt/sources.list 
+RUN wget -qO /etc/apt/keyrings/qgis-archive-keyring.gpg https://download.qgis.org/downloads/qgis-archive-keyring.gpg    
 
 # Install QGIS now
 RUN apt -y update \
@@ -213,7 +209,7 @@ RUN chmod u+s /usr/lib/libdlfaker.so
 RUN apt-get update && apt-get install -y grass
 
 # define username as ubuntu and limit its ownership
-ARG LOCAL_USER=ubuntu
+ARG LOCAL_USER=user
 
 # grant access to /usr/share/qgis to ${LOCAL_USER}
 RUN chown -R ${LOCAL_USER}:${LOCAL_USER} /usr/share/qgis
@@ -221,9 +217,6 @@ RUN chown -R ${LOCAL_USER}:${LOCAL_USER} /usr/share/qgis
 # set XDG_RUNTIME_DIR for qgis
 RUN mkdir /tmp/runtime-user && chown -R ${LOCAL_USER}:${LOCAL_USER} /tmp/runtime-user
 ENV XDG_RUNTIME_USER /tmp/runtime-user
-
-# change to QGIS user profile to remove any root access
-WORKDIR /home/${LOCAL_USER}/
 
 # set SHELL var to avoid /bin/sh fallback in interactive GRASS GIS sessions in docker
 ENV SHELL /bin/bash
@@ -234,10 +227,10 @@ RUN strip --remove-section=.note.ABI-tag /usr/lib/x86_64-linux-gnu/libQt5Core.so
 # enable simple grass command regardless of version number
 #RUN ln -s /usr/local/bin/grass* /usr/local/bin/grass
 
-USER ubuntu
+USER user
 
 ENV PATH=$PATH:$GISBASE/bin:$GISBASE/scripts
-ENV GISRC=/home/ubuntu/.grassrc82
+ENV GISRC=/home/user/.grassrc82
 
 # install external GRASS GIS session Python API
 RUN pip3 install grass-session
@@ -251,8 +244,8 @@ ENV TMPDIR="/tmp/grass8-ubuntu-$GIS_LOCK"
 
 # set GISDBASE, LOCATION_NAME, and/or MAPSET
 
-RUN mkdir /home/ubuntu/grassdata
-RUN echo "GISDBASE: /home/ubuntu/" >>$GISRC
+RUN mkdir /home/user/grassdata
+RUN echo "GISDBASE: /home/user/" >>$GISRC
 RUN echo "LOCATION_NAME: grassdata" >>$GISRC
 RUN echo "MAPSET: PERMANENT" >>$GISRC
 # start in text mode
@@ -262,7 +255,7 @@ RUN echo "GRASS_GUI: text" >>$GISRC
 ENV PATH=/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/VirtualGL/bin/:/usr/local/go/bin:/usr/lib/grass82/bin:/usr/lib/grass82/scriptsß
 
 # once everything is built, install a couple of GRASS extensions
-#RUN grass --text -c EPSG:3857 /home/ubuntu/grassdata/PERMANENT
+#RUN grass --text -c EPSG:3857 /home/user/grassdata/PERMANENT
 #RUN echo "g.extension -s extension=r.sun.mp ; g.extension -s extension=r.sun.hourly ; g.extension -s extension=r.sun.daily" | grass82 --text /home/ubuntu/grassdata/PERMANENT
 
 VOLUME /tmp/.X11-unix
