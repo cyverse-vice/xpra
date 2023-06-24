@@ -47,11 +47,13 @@ RUN apt-get update && \
     mercurial \
     mesa-utils \
     nautilus \
+    nautilus-admin \
     neofetch \
     nodejs \
     seahorse-nautilus \
     subversion \
     tasksel \
+    thunar \
     tmux \
     zsh \
     && \

@@ -128,13 +128,15 @@ ENV TZ America/Phoenix
 RUN apt install -y saga
 
 # Install QGIS Desktop binary
-RUN apt install gnupg software-properties-common -y
+RUN apt-get update && apt-get install gnupg software-properties-common -y
 
-RUN wget -qO /etc/apt/keyrings/qgis-archive-keyring.gpg https://download.qgis.org/downloads/qgis-archive-keyring.gpg    
+RUN wget -O /etc/apt/keyrings/qgis-archive-keyring.gpg https://download.qgis.org/downloads/qgis-archive-keyring.gpg
+
+RUN echo "Types: deb deb-src\nURIs: https://qgis.org/debian\nSuites: jammy\nArchitectures: amd64\nComponents: main\nSigned-By: /etc/apt/keyrings/qgis-archive-keyring.gpg" > /etc/apt/sources.list.d/qgis.sources
 
 # Install QGIS now
-RUN apt -y update \
-        && apt install -y \
+RUN apt-get update
+RUN apt-get install -y \
         qgis-plugin-grass \
         qgis 
 
