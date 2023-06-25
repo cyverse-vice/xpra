@@ -74,6 +74,7 @@ RUN apt-get update \
         ghostscript \
         git \
         gtk2-engines-pixbuf \
+        libgl1-mesa-dri \
         make \
         ncurses-bin \
         netcdf-bin \
@@ -91,6 +92,7 @@ RUN apt-get update \
         python3-pandas \
         python3-pil \
         python3-pillow \
+        python3-pip \
         #python3-psycopg2 \
         #python3-pyopengl \
         python3-ply \
@@ -105,6 +107,9 @@ RUN apt-get update \
         wget \
         wx3.0-headers \
         wx-common \
+        xvfb \
+        xauth \
+        xfonts-base \
         zlib1g-dev 
 
 ## Set gcc/g++ environmental variables for GRASS GIS compilation, without debug symbols
@@ -134,11 +139,12 @@ RUN wget -O /etc/apt/keyrings/qgis-archive-keyring.gpg https://download.qgis.org
 
 RUN echo "Types: deb deb-src\nURIs: https://qgis.org/debian\nSuites: jammy\nArchitectures: amd64\nComponents: main\nSigned-By: /etc/apt/keyrings/qgis-archive-keyring.gpg" > /etc/apt/sources.list.d/qgis.sources
 
-# Install QGIS now
-RUN apt-get update
+RUN apt-get update && apt-get install -y \
+    qgis \
+    qgis-plugin-grass 
+
 RUN apt-get install -y \
-        qgis-plugin-grass \
-        qgis 
+    grass grass-gui python3-wxgtk4.0
 
 # Reduce the image size
 RUN apt-get autoremove -y
@@ -154,122 +160,53 @@ ENV SHELL /bin/bash
 ENV LC_ALL "en_US.UTF-8"
 ENV GRASS_SKIP_MAPSET_OWNER_CHECK 1
 
-# add GRASS source repository files to the image https://grasswiki.osgeo.org/wiki/Compile_and_Install_Ubuntu
-RUN mkdir -p /opt/grass82 \
-        && wget -nv --no-check-certificate https://grass.osgeo.org/grass82/source/grass-8.2.0.tar.gz \
-        && tar xzf grass-8.2.0.tar.gz -C /opt/grass82 --strip-components=1 \
-        && rm -rf grass-8.2.0.tar.gz \
-        && cd /opt/grass82 && ./configure \
-        --enable-largefile \
-        --with-bzlib \
-        --with-cairo --with-cairo-ldflags=-lfontconfig \
-        --with-cxx \
-        --with-ffmpeg \
-        --with-fftw \
-        --with-freetype --with-freetype-includes="/usr/include/freetype2/" \
-        --with-gdal=/usr/bin/gdal-config \
-        --with-geos=/usr/bin/geos-config \
-        #--with-liblas \
-        --with-motif \
-        --with-netcdf \
-        --with-nls \
-        --with-opengl-libs=/usr/include/GL \
-        --with-openmp \
-        --with-pdal \
-        --with-postgres --with-postgres-includes="/usr/include/postgresql" \
-        --with-readline \
-        --with-proj --with-proj-share=/usr/share/proj \
-        --with-sqlite \ 
-        --with-zstd \
-        --with-wxwidgets \
-        --enable-64bit \
-        && make -j4 \
-        && make -j4 install \
-        && ldconfig
-
-# Configure and install GRASS GIS
-ENV GRASS_PYTHON=/usr/bin/python3
-ENV GISBASE "/usr/lib/grass82"
-ENV GRASSBIN "/usr/local/bin/grass82"
-ENV PYTHONPATH "${PYTHONPATH}:$GISBASE/etc/python/"
-ENV LD_LIBRARY_PATH "$LD_LIBRARY_PATH:$GISBASE/lib"
-ENV GIS_LOCK=$$
-ENV GISRC="/home/user/.grass82/rc"
-
-# Unset environmental variables to avoid later compilation issues
-ENV INTEL ""
-ENV MYCFLAGS ""
-ENV MYLDFLAGS ""
-ENV MYCXXFLAGS ""
-ENV LDFLAGS ""
-ENV CFLAGS ""
-ENV CXXFLAGS ""
-
-RUN chmod u+s /usr/lib/libdlfaker.so
-
-# Install GRASS-GIS GUI 
-RUN apt-get update && apt-get install -y grass
-
-# define username as ubuntu and limit its ownership
-ARG LOCAL_USER=user
-
 # grant access to /usr/share/qgis to ${LOCAL_USER}
-RUN chown -R ${LOCAL_USER}:${LOCAL_USER} /usr/share/qgis
+RUN chown -R 1000:1000 /usr/share/qgis
 
 # set XDG_RUNTIME_DIR for qgis
-RUN mkdir /tmp/runtime-user && chown -R ${LOCAL_USER}:${LOCAL_USER} /tmp/runtime-user
+RUN mkdir /tmp/runtime-user && chown -R 1000:1000 /tmp/runtime-user
 ENV XDG_RUNTIME_USER /tmp/runtime-user
 
 # set SHELL var to avoid /bin/sh fallback in interactive GRASS GIS sessions in docker
 ENV SHELL /bin/bash
 
 # VICE permissions error fix
+RUN chmod u+s /usr/lib/libdlfaker.so
 RUN strip --remove-section=.note.ABI-tag /usr/lib/x86_64-linux-gnu/libQt5Core.so.5
 
-# enable simple grass command regardless of version number
-#RUN ln -s /usr/local/bin/grass* /usr/local/bin/grass
+RUN chmod 0700 /run/user/1000
+
+# create desktop file for grass gis
+RUN echo "[Desktop Entry]\n\
+Type=Application\n\
+Encoding=UTF-8\n\
+Name=GRASS GIS\n\
+Comment=Geographic Resources Analysis Support System\n\
+Exec=grass\n\
+Icon=grass\n\
+Terminal=false\n\
+Categories=Application;Science;\n\
+StartupNotify=true" > /usr/share/applications/grass.desktop
+
+# for the changes to take effect
+RUN chmod +x /usr/share/applications/grass.desktop
 
 USER user
 
-ENV PATH=$PATH:$GISBASE/bin:$GISBASE/scripts
-ENV GISRC=/home/user/.grassrc82
-
 # install external GRASS GIS session Python API
-RUN pip3 install grass-session
-
-# path to GRASS settings file
-ENV GISRC=/tmp/grass8-ubuntu-$GIS_LOCK/gisrc
-# remove any leftover files/folder
-RUN rm -fr /tmp/grass8-ubuntu-$GIS_LOCK
-RUN mkdir /tmp/grass8-ubuntu-$GIS_LOCK
-ENV TMPDIR="/tmp/grass8-ubuntu-$GIS_LOCK"
-
-# set GISDBASE, LOCATION_NAME, and/or MAPSET
-
-RUN mkdir /home/user/grassdata
-RUN echo "GISDBASE: /home/user/" >>$GISRC
-RUN echo "LOCATION_NAME: grassdata" >>$GISRC
-RUN echo "MAPSET: PERMANENT" >>$GISRC
-# start in text mode
-RUN echo "GRASS_GUI: text" >>$GISRC
+RUN pip install grass-session
 
 # Removing Conda from PATH to fix Python SIP error with QGIS
-ENV PATH=/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/VirtualGL/bin/:/usr/local/go/bin:/usr/lib/grass82/bin:/usr/lib/grass82/scriptsß
-
-# once everything is built, install a couple of GRASS extensions
-#RUN grass --text -c EPSG:3857 /home/user/grassdata/PERMANENT
-#RUN echo "g.extension -s extension=r.sun.mp ; g.extension -s extension=r.sun.hourly ; g.extension -s extension=r.sun.daily" | grass82 --text /home/ubuntu/grassdata/PERMANENT
+ENV PATH=/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/VirtualGL/bin/:/usr/local/go/bin:/opt/conda/bin
 
 VOLUME /tmp/.X11-unix
 
-CMD xpra start \
-        --bind-tcp=0.0.0.0:9876 \
-        --start-child=xterm \
-        --exit-with-children=no \
-        --html=on \
-        --daemon=no \
-        --xvfb="/usr/bin/Xvfb +extension Composite -screen 0 1920x1080x24+32 -nolisten tcp -noreset" \
-        --pulseaudio=no \
-        --notifications=no \
-        --bell=no \
-        :100
+# create ~/data-store for CSI driver fuse mount
+WORKDIR /home/user/data-store
+
+# expose port 9876 for Xpra windows
+EXPOSE 9876
+
+# changes tmux layout while running
+COPY entry.sh /bin
+ENTRYPOINT ["bash", "/bin/entry.sh"]
