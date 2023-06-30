@@ -9,7 +9,7 @@
 
 | quick launch | 
 |--------------|
-| <a href="https://de.cyverse.org/apps/de/f3f8cc78-23d5-11ec-abcf-008cfa5ae621/launch" target="_blank"><img src="https://img.shields.io/badge/Xpra-Desktop-orange?style=plastic&logo=X.Org"></a> |
+| <a href="https://de.cyverse.org/apps/de/b5e65b52-0de5-11ee-9b7a-008cfa5ae621/launch" target="_blank"><img src="https://img.shields.io/badge/Xpra-Desktop-orange?style=plastic&logo=X.Org"></a> |
 
 # Docker
 
