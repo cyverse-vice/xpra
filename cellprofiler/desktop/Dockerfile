@@ -1,11 +1,11 @@
-# CellProfiler plugins GitHub page https://github.com/CellProfiler/CellProfiler-plugins) 
+# CellProfiler plugins GitHub page https://github.com/CellProfiler/CellProfiler-plugins)
 # the plug-ins (listed on the page as runcellpose.py, runstardist.py, runimagejscript.py) are
 # CellPose (https://cellpose.readthedocs.io/en/latest/ https://www.cellpose.org/)
 # StartDist (https://github.com/stardist/stardist https://imagej.net/plugins/stardist)
 # ImageJ (https://imagej.nih.gov/ij/)
 # https://cellprofiler-manual.s3.amazonaws.com/CPmanual/RunImageJ.html)
 
-FROM harbor.cyverse.org/vice/xpra/desktop:22.04 
+FROM harbor.cyverse.org/vice/xpra/desktop:22.04
 
 USER root
 
@@ -15,13 +15,13 @@ RUN apt-get update && \
     default-jre \
     default-jdk \
     && \
-    apt-get clean && \ 
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
-    apt-get clean && \ 
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /opt/ImageJ && \
-    wget https://downloads.imagej.net/fiji/latest/fiji-linux64.zip && \ 
+    wget https://downloads.imagej.net/fiji/latest/fiji-linux64.zip && \
     # unzip .zip file to /opt/ImageJ
     unzip -o fiji-linux64.zip -d /opt/ImageJ  && \
     rm -rf fiji-linux64.zip && \
@@ -34,9 +34,9 @@ RUN apt-get update && \
     python3-pip \
     python3-tk \
     && \
-    apt-get clean && \ 
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
-    apt-get clean && \ 
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # set back as `user`
@@ -80,5 +80,6 @@ RUN cd && \
 
 # changes tmux layout while running
 COPY entry.sh /bin
+COPY CellProfilerLocal.cfg /home/user
 RUN echo 'set-option -g status off' >> ~/.tmux.conf
 ENTRYPOINT ["bash", "/bin/entry.sh"]
