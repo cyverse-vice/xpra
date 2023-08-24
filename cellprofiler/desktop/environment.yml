@@ -20,12 +20,12 @@ dependencies:
 - gtk3
 - Jinja2=3.0.1
 - inflect=5.3.0
-- wxpython=4.2.1
+- wxpython=4.1.0
 - mysqlclient=1.4.4
 - sentry-sdk=0.18.0
 - ipykernel
-- cellprofiler=4.2.1
 - pip:
+    - cellprofiler==4.2.6
     - cellpose==2.2.2
     - cellpose[gui]
     - csbdeep
