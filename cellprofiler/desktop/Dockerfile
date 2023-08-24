@@ -31,13 +31,37 @@ RUN mkdir -p /opt/ImageJ && \
 # Install CellProfiler Dependencies
 RUN apt-get update && \
     apt-get install -y \
+    make \ 
+    gcc \
+    build-essential \
+    libgtk-3-dev \
+    openjdk-11-jdk-headless \ 
+    default-libmysqlclient-dev \ 
+    libnotify-dev \ 
+    libsdl2-dev \
     python3-pip \
     python3-tk \
+    freeglut3 \
+    freeglut3-dev \
+    libgl1-mesa-dev \
+    libglu1-mesa-dev \
+    libgstreamer-plugins-base1.0-dev \
+    libgtk-3-dev \
+    libjpeg-dev \
+    libnotify-dev \
+    libsdl2-dev \
+    libsm-dev \
+    libtiff-dev \
+    libwebkit2gtk-4.0-dev \
+    libxtst-dev \
     && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
+# Adding Java home to bashrc
+RUN echo "export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64" >> ~/.bashrc
 
 # set back as `user`
 USER user
