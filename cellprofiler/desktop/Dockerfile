@@ -45,8 +45,8 @@ USER user
 # Install CellProfiler
 COPY environment.yml /home/user/environment.yml
 RUN cd && \
-    conda install -c conda-forge mamba && \
-    mamba env create -f environment.yml && \
+    conda install -c conda-forge mamba -y && \
+    mamba env create -f environment.yml -y && \
     echo "source activate cellprofiler" >> ~/.bashrc && \
     /bin/bash -c "source activate cellprofiler"
 
