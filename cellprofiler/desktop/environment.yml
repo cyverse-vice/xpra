@@ -16,11 +16,10 @@ dependencies:
 - openjdk
 - scikit-learn
 - mahotas
-- gtk2
 - python-javabridge
 - Jinja2=3.0.1
 - inflect=5.3.0
-- wxPython=4.1.0
+- wxPython
 - mysqlclient=1.4.4
 - sentry-sdk=0.18.0
 - ipykernel

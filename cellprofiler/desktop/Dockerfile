@@ -54,24 +54,26 @@ RUN apt-get update && \
     libtiff-dev \
     libwebkit2gtk-4.0-dev \
     libxtst-dev \
+    nano \
     && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Adding Java home to bashrc
-RUN echo "export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64" >> ~/.bashrc
+RUN apt-get update && apt-get upgrade -y
 
 # set back as `user`
 USER user
 
+# Adding Java home to bashrc & 
 # Install CellProfiler
 COPY environment.yml /home/user/environment.yml
 RUN cd && \
     conda install -c conda-forge mamba -y && \
     mamba env create -f environment.yml -y && \
     echo "source activate cellprofiler" >> ~/.bashrc && \
+    echo "export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64" >> ~/.bashrc && \
     /bin/bash -c "source activate cellprofiler"
 
 # add `cellprofiler` `cellpose` and `imagej` to Gnome Applications Menu
