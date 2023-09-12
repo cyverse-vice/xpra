@@ -1,16 +1,16 @@
-# Dockerfile modified to bionic from https://github.com/lanrat/docker-xpra-html5
-FROM nvcr.io/nvidia/cuda:12.1.1-runtime-ubuntu22.04
+FROM nvcr.io/nvidia/cuda:12.2.0-runtime-ubuntu22.04
 
 LABEL Author "Tyson Lee Swetnam"
 LABEL Contact "tswetnam@cyverse.org"
 
 ENV DEBIAN_FRONTEND=noninteractive
-
+USER root
 # Install basics, gnome desktop, benchmarks
-RUN apt-get update 
-RUN apt-get install -y \
-    apt-transport-https \
-    ca-certificates \
+RUN apt-get update && apt-get install -y apt-transport-https
+#RUN apt-get update && apt-get install -y \
+#    ca-certificates \
+#    software-properties-common 
+RUN apt-get update && apt-get install -y \
     curl \
     dpkg \
     figlet \
@@ -20,14 +20,12 @@ RUN apt-get install -y \
     glances \
     glmark2 \
     sed \
-    software-properties-common \
     sudo \
     wget \
     xterm \
     xvfb 
 
-RUN apt-get update && \
-    apt-get install -y \
+RUN apt-get update && apt-get install -y \
     freeglut3-dev \
     gnome-shell \ 
     gnome-session \ 
@@ -58,6 +56,20 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean && \ 
     rm -rf /var/lib/apt/lists/*
+
+# Add NVIDIA CUDA repository
+RUN curl -sL https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-ubuntu2204.pin | \
+    tee /etc/apt/preferences.d/cuda-repository-pin-600 && \
+    echo "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/ /" | \
+    tee /etc/apt/sources.list.d/cuda.list
+
+# Install NVIDIA CUDA GL libraries
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        nvidia-cuda-toolkit \
+        libgl1-mesa-glx \
+        libgl1-mesa-dri \
+    && rm -rf /var/lib/apt/lists/*
 
 # install XPRA: https://github.com/Xpra-org/xpra/wiki/Download#-linux
 RUN wget -q https://xpra.org/gpg.asc -O- | apt-key add - &&  \
