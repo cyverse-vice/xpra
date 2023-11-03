@@ -31,13 +31,13 @@ RUN mkdir -p /opt/ImageJ && \
 # Install CellProfiler Dependencies
 RUN apt-get update && \
     apt-get install -y \
-    make \ 
+    make \
     gcc \
     build-essential \
     libgtk-3-dev \
-    openjdk-11-jdk-headless \ 
-    default-libmysqlclient-dev \ 
-    libnotify-dev \ 
+    openjdk-11-jdk-headless \
+    default-libmysqlclient-dev \
+    libnotify-dev \
     libsdl2-dev \
     python3-pip \
     python3-tk \
@@ -63,10 +63,14 @@ RUN apt-get update && \
 
 RUN apt-get update && apt-get upgrade -y
 
+# Install TensorFlow.
+RUN pip install --upgrade pip && \
+    pip install tensorflow
+
 # set back as `user`
 USER user
 
-# Adding Java home to bashrc & 
+# Adding Java home to bashrc &
 # Install CellProfiler
 COPY environment.yml /home/user/environment.yml
 RUN cd && \
