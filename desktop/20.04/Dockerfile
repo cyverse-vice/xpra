@@ -65,7 +65,7 @@ RUN apt-get update && \
 # install XPRA: https://github.com/Xpra-org/xpra/wiki/Download#-linux
 
 RUN wget -q https://xpra.org/gpg.asc -O- | apt-key add - &&  \
-    echo "deb https://xpra.org/ jammy main" >> /etc/apt/sources.list.d/xpra.list && \
+    echo "deb https://xpra.org/ focal main" >> /etc/apt/sources.list.d/xpra.list && \
     apt update && \
     apt install xpra -y
 
