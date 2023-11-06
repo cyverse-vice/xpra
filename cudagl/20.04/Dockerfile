@@ -7,26 +7,31 @@ LABEL Contact "tswetnam@cyverse.org"
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install basics, gnome desktop, benchmarks
-RUN apt update && \
-    apt install -y \
+RUN apt-get update 
+RUN apt-get install -y \
     apt-transport-https \
-    apt-utils \   
-    bzip2 \
     ca-certificates \
     curl \
     dpkg \
-    emacs-nox \
     figlet \
-    firefox \
     gcc \
     gdm3 \    
     git \
     glances \
     glmark2 \
+    sed \
+    software-properties-common \
+    sudo \
+    wget \
+    xterm \
+    xvfb 
+
+RUN apt-get update && \
+    apt-get install -y \
     gnome-shell \ 
     gnome-session \ 
     gnome-terminal \
-    gnupg2 \
+    gpgv \
     grep \
     htop \
     less \
@@ -40,19 +45,14 @@ RUN apt update && \
     mercurial \
     mesa-utils \
     nautilus \
+    nautilus-admin \
     neofetch \
     nodejs \
     seahorse-nautilus \
-    sed \
-    software-properties-common \
     subversion \
-    sudo \
     tasksel \
+    thunar \
     tmux \
-    vim-nox \
-    wget \
-    xterm \
-    xvfb \
     zsh \
     && \
     apt-get clean && \ 
@@ -60,17 +60,17 @@ RUN apt update && \
     apt-get clean && \ 
     rm -rf /var/lib/apt/lists/*
 
-# install XPRA: https://xpra.org/trac/wiki/Usage/Docker 
-RUN wget -O - http://winswitch.org/gpg.asc | apt-key add - &&  echo "deb http://winswitch.org/ focal main" > /etc/apt/sources.list.d/xpra.list && \
-    wget -q https://xpra.org/gpg.asc -O- | apt-key add - &&  \
+# install XPRA: https://github.com/Xpra-org/xpra/wiki/Download#-linux
+
+RUN wget -q https://xpra.org/gpg.asc -O- | apt-key add - &&  \
     echo "deb https://xpra.org/ focal main" >> /etc/apt/sources.list.d/xpra.list && \
     apt update && \
     apt install xpra -y
 
 # Install VirtualGL
 RUN cd /tmp && \
-    wget https://sourceforge.net/projects/virtualgl/files/3.0.1/virtualgl_3.0.1_amd64.deb/download -O virtualgl_3.0.1_amd64.deb && \
-    dpkg -i --force-depends virtualgl_3.0.1_amd64.deb && \
+    wget https://sourceforge.net/projects/virtualgl/files/3.1/virtualgl_3.1_amd64.deb/download -O virtualgl_3.1_amd64.deb && \
+    dpkg -i --force-depends virtualgl_3.1_amd64.deb && \
     apt -f install -y 
 
 # Create XAuthority configurations
@@ -82,7 +82,7 @@ RUN export XAUTHORITY=~/.Xauthority && \
 # define username as ubuntu and limit its ownership
 ARG LOCAL_USER=ubuntu
 
-ARG PRIV_CMDS='/bin/ch*,/bin/cat,/bin/gunzip,/bin/tar,/bin/mkdir,/bin/ps,/bin/mv,/bin/cp,/usr/bin/apt*,/usr/bin/pip*,/bin/yum'
+ARG PRIV_CMDS='/bin/ch*,/bin/cat,/bin/gunzip,/bin/tar,/bin/mkdir,/bin/ps,/bin/mv,/bin/cp,/usr/bin/apt*,/usr/bin/pip*,/bin/yum,/bin/snap,/bin/curl,/bin/tee'
 
 RUN adduser --disabled-password --gecos "ubuntu" --uid 1000 ${LOCAL_USER}  && \
     usermod -aG sudo ${LOCAL_USER} && \
@@ -110,23 +110,26 @@ RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86
     echo ". /opt/conda/etc/profile.d/conda.sh" >> /home/${LOCAL_USER}/.zshrc && \
     chown -R ${LOCAL_USER}:${LOCAL_USER} /opt/conda
 
-ENV TINI_VERSION 0.19.0
-RUN apt-get update && \
-    curl -L "https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini_${TINI_VERSION}-amd64.deb" > tini.deb && \
-    dpkg -i tini.deb && \
-    rm tini.deb && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+# ENV TINI_VERSION 0.19.0
+# RUN apt-get update && \
+#    curl -L "https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini_${TINI_VERSION}-amd64.deb" > tini.deb && \
+#    dpkg -i tini.deb && \
+#    rm tini.deb && \
+#    apt-get clean && \
+#    rm -rf /var/lib/apt/lists/*
+
 # Install Go
-RUN wget -q -c https://dl.google.com/go/go1.16.4.linux-amd64.tar.gz -O - | tar -xz -C /usr/local
+RUN wget -q -c https://dl.google.com/go/go1.20.5.linux-amd64.tar.gz -O - | tar -xz -C /usr/local
 
 # install ttyd
-RUN curl -L "https://github.com/tsl0922/ttyd/releases/download/1.6.3/ttyd.x86_64" > ttyd && \
+RUN curl -L "https://github.com/tsl0922/ttyd/releases/download/1.7.3/ttyd.x86_64" > ttyd && \
     chmod a+x ttyd && \
     mv ttyd /usr/local/bin/ttyd
 
 # getting a locales error
-RUN apt-get clean && apt-get update && apt-get install locales && locale-gen en_US.UTF-8
+RUN apt-get clean && \
+    apt-get install locales -y && \
+    locale-gen en_US.UTF-8
 
 # update terminal message
 ENV PATH=${PATH}:/usr/games
@@ -134,16 +137,43 @@ COPY 01-custom /etc/motd
 RUN chmod +x /etc/motd
 
 # Install CyberDuck CLI
-RUN echo "deb https://s3.amazonaws.com/repo.deb.cyberduck.io stable main" > /etc/apt/sources.list.d/cyberduck.list && \
-    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys FE7097963FEFBE72 && \
-    apt update && \
-    apt install duck
+# RUN echo "deb https://s3.amazonaws.com/repo.deb.cyberduck.io stable main" > /etc/apt/sources.list.d/cyberduck.list && \
+#    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys FE7097963FEFBE72 && \
+#    apt update && \
+#    apt install duck
 
 # Install GitHub CLI
-RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/etc/apt/trusted.gpg.d/githubcli-archive-keyring.gpg && \
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/trusted.gpg.d/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" > /etc/apt/sources.list.d/github-cli.list && \
-    apt update && \
-    apt install gh
+# RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/etc/apt/trusted.gpg.d/githubcli-archive-keyring.gpg && \
+#    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/trusted.gpg.d/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" > /etc/apt/sources.list.d/github-cli.list && \
+#    apt update && \
+#    apt install gh
+
+# Install GoCommmands
+RUN cd /usr/local/bin/ && \
+    GOCMD_VER=$(curl -L -s https://raw.githubusercontent.com/cyverse/gocommands/main/VERSION.txt); curl -L -s https://github.com/cyverse/gocommands/releases/download/${GOCMD_VER}/gocmd-${GOCMD_VER}-linux-amd64.tar.gz | tar zxvf -
+
+
+# Remove the Firefox Snap
+RUN sudo apt-get remove -y firefox
+
+# Add the Mozilla team PPA to your list of software sources
+RUN sudo add-apt-repository -y ppa:mozillateam/ppa
+
+# Alter the Firefox package priority to ensure the PPA/deb/apt version of Firefox is preferred
+RUN echo '\n\
+Package: *\n\
+Pin: release o=LP-PPA-mozillateam\n\
+Pin-Priority: 1001\n\
+' | sudo tee /etc/apt/preferences.d/mozilla-firefox
+
+# Ensure future Firefox upgrades will be installed automatically
+RUN echo 'Unattended-Upgrade::Allowed-Origins:: "LP-PPA-mozillateam:${distro_codename}";' | sudo tee /etc/apt/apt.conf.d/51unattended-upgrades-firefox
+
+# Finally, install Firefox via apt
+RUN sudo apt-get update && sudo apt-get install -y firefox
+
+# Switch back to dialog for any ad-hoc use of apt-get
+ENV DEBIAN_FRONTEND=dialog
 
 # ready to set user 
 USER ${LOCAL_USER}
@@ -155,10 +185,13 @@ RUN echo '[ ! -z "$TERM" -a -r /etc/motd ] && /etc/motd' >> ~/.zshrc
 # set path for Go and VirtualGL
 ENV PATH=${PATH}:/usr/local/go/bin:/opt/VirtualGL/bin
 
-# set shell as zsh
-ENV SHELL=zsh
+# set shell as bash
+ENV SHELL=bash
 ENV TERM=linux
 ENV DISPLAY=:100
+
+# create ~/data-store for CSI driver fuse mount
+RUN mkdir /home/user/data-store
 
 WORKDIR /home/${LOCAL_USER}
 
@@ -169,4 +202,4 @@ EXPOSE 9876
 COPY entry.sh /bin
 RUN echo 'set-option -g status off' >> ~/.tmux.conf
 
-ENTRYPOINT ["zsh", "/bin/entry.sh"]
+ENTRYPOINT ["bash", "/bin/entry.sh"]
