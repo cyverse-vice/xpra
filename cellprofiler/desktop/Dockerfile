@@ -64,8 +64,8 @@ RUN apt-get update && \
 RUN apt-get update && apt-get upgrade -y
 
 # Install TensorFlow.
-RUN pip install --upgrade pip && \
-    pip install tensorflow
+# RUN pip install --upgrade pip && \
+#     pip install tensorflow
 
 # set back as `user`
 USER user
