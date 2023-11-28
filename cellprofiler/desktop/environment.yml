@@ -7,9 +7,9 @@ channels:
 - defaults
 
 dependencies:
-- python=3.8
+- python>=3.9
 - pip
-- numpy=1.23.0
+- numpy>=1.23.0
 - matplotlib
 - pandas
 - mysqlclient
@@ -17,15 +17,17 @@ dependencies:
 - scikit-learn
 - mahotas
 - python-javabridge
-- Jinja2=3.0.1
-- inflect=5.3.0
+- Jinja2>=3.0.1
+- inflect>=5.3.0
 - wxPython
-- mysqlclient=1.4.4
-- sentry-sdk=0.18.0
+- mysqlclient>=1.4.4
+- sentry-sdk>=0.18.0
 - ipykernel
 - pip:
     - cellprofiler==4.2.6
-    - cellpose==2.2.2
+    - cellpose==2.2.3
     - cellpose[gui]
     - csbdeep
     - stardist
+    - torch
+    - tensorflow
