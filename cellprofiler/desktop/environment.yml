@@ -5,6 +5,8 @@ channels:
 - anaconda
 - bioconda
 - defaults
+- pytorch
+- nvidia
 
 dependencies:
 - python=3.8
@@ -23,9 +25,14 @@ dependencies:
 - mysqlclient=1.4.4
 - sentry-sdk=0.18.0
 - ipykernel
+- pytorch
+- tensorflow
+- pytorch-cuda=11.6
+- torchvision 
+- cudatoolkit
 - pip:
     - cellprofiler==4.2.6
-    - cellpose==2.2.2
+    - cellpose==2.2.3
     - cellpose[gui]
     - csbdeep
     - stardist

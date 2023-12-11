@@ -61,13 +61,16 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update && apt-get upgrade -y
+RUN apt-get upgrade -y
+
+#RUN chown -R user:user /home/user
 
 # Install TensorFlow.
-RUN pip install --upgrade pip && \
-    pip install tensorflow
+#RUN pip install --upgrade pip && \
+#    pip install tensorflow
 
 # set back as `user`
+# RUN usermod -aG sudo user
 USER user
 
 # Adding Java home to bashrc &
