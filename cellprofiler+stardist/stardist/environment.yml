@@ -1,0 +1,37 @@
+name: cellprofiler
+
+channels:
+- conda-forge
+- anaconda
+- bioconda
+- defaults
+- pytorch
+- nvidia
+
+dependencies:
+- python==3.8
+- pip
+- numpy>=1.23.0
+- matplotlib
+- pandas
+- mysqlclient
+- openjdk
+- scikit-learn
+- mahotas
+- python-javabridge
+- Jinja2>=3.0.1
+- inflect>=5.3.0
+- wxPython
+- mysqlclient>=1.4.4
+- sentry-sdk>=0.18.0
+- ipykernel
+- pytorch
+- cuda=11.6
+- pytorch-cuda=11.6
+- pip:
+    - cellprofiler==4.2.6
+    - cellpose==2.2.3
+    - cellpose[gui]
+    - csbdeep
+    - stardist
+    - tensorflow
