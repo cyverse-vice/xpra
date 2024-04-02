@@ -5,7 +5,7 @@
 # ImageJ (https://imagej.nih.gov/ij/)
 # https://cellprofiler-manual.s3.amazonaws.com/CPmanual/RunImageJ.html)
 
-FROM harbor.cyverse.org/vice/kasm/ubuntu:22.04
+FROM harbor.cyverse.org/vice/xpra/desktop:22.04
 
 USER root
 
