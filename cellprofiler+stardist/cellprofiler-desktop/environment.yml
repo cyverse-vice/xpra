@@ -33,5 +33,4 @@ dependencies:
     - cellpose==2.2.3
     - cellpose[gui]
     - csbdeep
-    - stardist
     - tensorflow

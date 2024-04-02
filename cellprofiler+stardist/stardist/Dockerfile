@@ -100,7 +100,7 @@ USER kasm-user
 
 # Adding Java home to bashrc &
 # Install CellProfiler
-COPY environment.yml /home/kasm-user/environment.yml
+COPY environment.yml /home/user/environment.yml
 RUN cd && \
     conda install -c conda-forge mamba -y && \
     mamba env create -f environment.yml -y && \
@@ -110,31 +110,27 @@ RUN cd && \
 
 # add `cellprofiler` `cellpose` and `imagej` to Gnome Applications Menu
 RUN mkdir -p ~/.local/share/applications && \
-    echo "[Desktop Entry]" >> ~/.local/share/applications/cellprofiler.desktop && \
-    echo "Name=CellProfiler" >> ~/.local/share/applications/cellprofiler.desktop && \
-    echo "Exec=/bin/bash -c 'source activate cellprofiler && cellprofiler'" >> ~/.local/share/applications/cellprofiler.desktop && \
-    echo "Icon=" >> ~/.local/share/applications/cellprofiler.desktop && \
-    echo "Type=Application" >> ~/.local/share/applications/cellprofiler.desktop && \
-    echo "Categories=Application;Development;" >> ~/.local/share/applications/cellprofiler.desktop && \
-    echo "Terminal=false" >> ~/.local/share/applications/cellprofiler.desktop && \
+#    echo "[Desktop Entry]" >> ~/.local/share/applications/cellprofiler.desktop && \
+#    echo "Name=CellProfiler" >> ~/.local/share/applications/cellprofiler.desktop && \
+#    echo "Exec=/bin/bash -c 'source activate cellprofiler && cellprofiler'" >> ~/.local/share/applications/cellprofiler.desktop && \
+#    echo "Icon=" >> ~/.local/share/applications/cellprofiler.desktop && \
+#    echo "Type=Application" >> ~/.local/share/applications/cellprofiler.desktop && \
+#    echo "Categories=Application;Development;" >> ~/.local/share/applications/cellprofiler.desktop && \
+#    echo "Terminal=false" >> ~/.local/share/applications/cellprofiler.desktop && \
     echo "[Desktop Entry]" >> ~/.local/share/applications/imagej.desktop && \
     echo "Name=ImageJ" >> ~/.local/share/applications/imagej.desktop && \
-    echo "Exec=/bin/bash -c 'source activate cellprofiler && imagej'" >> ~/.local/share/applications/imagej.desktop && \
+#    echo "Exec=/bin/bash -c 'source activate imagej'" >> ~/.local/share/applications/imagej.desktop && \
     echo "Icon=" >> ~/.local/share/applications/imagej.desktop && \
     echo "Type=Application" >> ~/.local/share/applications/imagej.desktop && \
     echo "Categories=Application;Development;" >> ~/.local/share/applications/imagej.desktop && \
     echo "Terminal=false" >> ~/.local/share/applications/imagej.desktop && \
     echo "[Desktop Entry]" >> ~/.local/share/applications/cellpose.desktop && \
     echo "Name=CellPose" >> ~/.local/share/applications/cellpose.desktop && \
-    echo "Exec=/bin/bash -c 'source activate cellprofiler && cellpose'" >> ~/.local/share/applications/cellpose.desktop && \
+    echo "Exec=/bin/bash -c 'source activate cellpose'" >> ~/.local/share/applications/cellpose.desktop && \
     echo "Icon=" >> ~/.local/share/applications/cellpose.desktop && \
     echo "Type=Application" >> ~/.local/share/applications/cellpose.desktop && \
     echo "Categories=Application;Development;" >> ~/.local/share/applications/cellpose.desktop && \
     echo "Terminal=false" >> ~/.local/share/applications/cellpose.desktop
-
-# Install CellProfiler Plugins
-RUN cd && \
-    git clone https://github.com/CellProfiler/CellProfiler-plugins.git
 
 # changes tmux layout while running
 # COPY entry.sh /bin
