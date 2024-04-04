@@ -25,10 +25,10 @@ RUN mkdir -p /opt/ImageJ && \
     # unzip .zip file to /opt/ImageJ
     unzip -o fiji-linux64.zip -d /opt/ImageJ  && \
     rm -rf fiji-linux64.zip && \
-    chown -R kasm-user:kasm-user /opt/ImageJ && \
+    chown -R user:user /opt/ImageJ && \
     ln -s /opt/ImageJ/Fiji.app/ImageJ-linux64 /usr/local/bin/imagej
 
-# Install CellProfiler Dependencies
+# Install StarDist Dependencies
 RUN apt-get update && \
     apt-get install -y \
     make \
@@ -63,23 +63,6 @@ RUN apt-get update && \
 
 RUN apt-get update && apt-get upgrade -y
 
-# define username as ubuntu and limit its ownership
-ARG LOCAL_USER=kasm-user
-ENV TZ America/Phoenix
-ENV LANG=C.UTF-8 
-ENV LC_ALL "en_US.UTF-8"
-ENV PATH /opt/conda/bin:$PATH
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
-    echo $TZ > /etc/timezone
-
-RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh && \
-    /bin/bash ~/miniconda.sh -b -p /opt/conda && \
-    rm ~/miniconda.sh && \
-    ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh && \
-    echo ". /opt/conda/etc/profile.d/conda.sh" >> /home/${LOCAL_USER}/.bashrc && \
-    echo ". /opt/conda/etc/profile.d/conda.sh" >> /home/${LOCAL_USER}/.zshrc && \
-    chown -R ${LOCAL_USER}:${LOCAL_USER} /opt/conda
-
 # Install Go
 RUN wget -q -c https://dl.google.com/go/go1.20.5.linux-amd64.tar.gz -O - | tar -xz -C /usr/local
 
@@ -91,12 +74,8 @@ RUN cd /usr/local/bin/ && \
 # RUN pip install --upgrade pip && \
 #     pip install tensorflow
 
-# Change ownership of the home directory
-USER root
-RUN chown -R kasm-user:kasm-user /home/kasm-user
-
 # set back as `user`
-USER kasm-user
+USER user
 
 # Adding Java home to bashrc &
 # Install CellProfiler
