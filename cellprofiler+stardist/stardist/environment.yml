@@ -34,3 +34,4 @@ dependencies:
     - csbdeep
     - tensorflow
     - stardist
+    - notebook
