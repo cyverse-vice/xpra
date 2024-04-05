@@ -61,31 +61,27 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update && apt-get upgrade -y
+# RUN apt-get update && apt-get upgrade -y
 
 # Install Go
 RUN wget -q -c https://dl.google.com/go/go1.20.5.linux-amd64.tar.gz -O - | tar -xz -C /usr/local
 
 # Install GoCommmands
 RUN cd /usr/local/bin/ && \
-    GOCMD_VER=$(curl -L -s https://raw.githubusercontent.com/cyverse/gocommands/main/VERSION.txt); curl -L -s https://github.com/cyverse/gocommands/releases/download/${GOCMD_VER}/gocmd-${GOCMD_VER}-linux-amd64.tar.gz | tar zxvf -
-
-# Install TensorFlow.
-# RUN pip install --upgrade pip && \
-#     pip install tensorflow
+   GOCMD_VER=$(curl -L -s https://raw.githubusercontent.com/cyverse/gocommands/main/VERSION.txt); curl -L -s https://github.com/cyverse/gocommands/releases/download/${GOCMD_VER}/gocmd-${GOCMD_VER}-linux-amd64.tar.gz | tar zxvf -
 
 # set back as `user`
 USER user
 
-# Adding Java home to bashrc &
-# Install CellProfiler
+########### Adding Java home to bashrc &
+# Install StarDist
 COPY environment.yml /home/user/environment.yml
 RUN cd && \
     conda install -c conda-forge mamba -y && \
     mamba env create -f environment.yml -y && \
-    echo "source activate cellprofiler" >> ~/.bashrc && \
+    echo "source activate stardist" >> ~/.bashrc && \
     echo "export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64" >> ~/.bashrc && \
-    /bin/bash -c "source activate cellprofiler"
+    /bin/bash -c "source activate stardist"
 
 # add `cellprofiler` `cellpose` and `imagej` to Gnome Applications Menu
 RUN mkdir -p ~/.local/share/applications && \
