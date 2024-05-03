@@ -1,7 +1,7 @@
 # CellProfiler plugins GitHub page https://github.com/CellProfiler/CellProfiler-plugins)
 # the plug-ins (listed on the page as runcellpose.py, runstardist.py, runimagejscript.py) are
 # CellPose (https://cellpose.readthedocs.io/en/latest/ https://www.cellpose.org/)
-# StartDist (https://github.com/stardist/stardist https://imagej.net/plugins/stardist)
+# StartDist (https://github.com/stardist/stardist https://imagej.net/plugins/stardist). Note: Stardist is going to be developed in its own Jupyter container.
 # ImageJ (https://imagej.nih.gov/ij/)
 # https://cellprofiler-manual.s3.amazonaws.com/CPmanual/RunImageJ.html)
 
@@ -107,6 +107,8 @@ RUN mkdir -p ~/.local/share/applications && \
 # Install CellProfiler Plugins
 RUN cd && \
     git clone https://github.com/CellProfiler/CellProfiler-plugins.git
+
+RUN gocmd upgrade
 
 # changes tmux layout while running
 COPY entry.sh /bin

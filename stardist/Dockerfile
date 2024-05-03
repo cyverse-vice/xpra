@@ -94,7 +94,7 @@ RUN mkdir -p ~/.local/share/applications && \
 #    echo "Terminal=false" >> ~/.local/share/applications/cellprofiler.desktop && \
     echo "[Desktop Entry]" >> ~/.local/share/applications/imagej.desktop && \
     echo "Name=ImageJ" >> ~/.local/share/applications/imagej.desktop && \
-#    echo "Exec=/bin/bash -c 'source activate imagej'" >> ~/.local/share/applications/imagej.desktop && \
+    echo "Exec=/bin/bash -c 'source activate imagej'" >> ~/.local/share/applications/imagej.desktop && \
     echo "Icon=" >> ~/.local/share/applications/imagej.desktop && \
     echo "Type=Application" >> ~/.local/share/applications/imagej.desktop && \
     echo "Categories=Application;Development;" >> ~/.local/share/applications/imagej.desktop && \
@@ -105,10 +105,11 @@ RUN mkdir -p ~/.local/share/applications && \
     echo "Icon=" >> ~/.local/share/applications/cellpose.desktop && \
     echo "Type=Application" >> ~/.local/share/applications/cellpose.desktop && \
     echo "Categories=Application;Development;" >> ~/.local/share/applications/cellpose.desktop && \
-    echo "Terminal=false" >> ~/.local/share/applications/cellpose.desktop
-
-# changes tmux layout while running
-# COPY entry.sh /bin
-# COPY CellProfilerLocal.cfg /home/kasm-user
-# RUN echo 'set-option -g status off' >> ~/.tmux.conf
-# ENTRYPOINT ["bash", "/bin/entry.sh"]
+    echo "Terminal=false" >> ~/.local/share/applications/cellpose.desktop && \
+    echo "[Desktop Entry]" >> ~/.local/share/applications/jupyter.desktop && \
+    echo "Name=Jupyter Notebook" >> ~/.local/share/applications/jupyter.desktop && \
+    echo "Exec=/bin/bash -c 'source activate stardist && jupyter notebook --ip=0.0.0.0 --port=8888 --allow-root --no-browser'" >> ~/.local/share/applications/jupyter.desktop && \
+    echo "Icon=" >> ~/.local/share/applications/jupyter.desktop && \
+    echo "Type=Application" >> ~/.local/share/applications/jupyter.desktop && \
+    echo "Categories=Application;Development;" >> ~/.local/share/applications/jupyter.desktop && \
+    echo "Terminal=false" >> ~/.local/share/applications/jupyter.desktop
