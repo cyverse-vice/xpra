@@ -54,8 +54,7 @@ RUN apt-get update && \
     libtiff-dev \
     libwebkit2gtk-4.0-dev \
     libxtst-dev \
-    nano \
-    && \
+    nano && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean && \
