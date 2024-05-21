@@ -9,7 +9,12 @@ channels:
 - nvidia
 
 dependencies:
-- python==3.8
+- python
+- pytorch
+- torchvision
+- torchaudio
+- cuda
+- opencv
 - pip
 - numpy>=1.23.0
 - matplotlib
@@ -25,12 +30,6 @@ dependencies:
 - mysqlclient>=1.4.4
 - sentry-sdk>=0.18.0
 - ipykernel
-- pytorch
-- cuda=11.6
-- pytorch-cuda=11.6
-- pip:
-    - cellprofiler==4.2.6
-    - cellpose==2.2.3
-    - cellpose[gui]
-    - csbdeep
-    - tensorflow
+- pytorch-cuda=12.1
+- tensorflow
+- cudatoolkit

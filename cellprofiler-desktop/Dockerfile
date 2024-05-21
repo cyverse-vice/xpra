@@ -60,7 +60,8 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update && apt-get upgrade -y
+#RUN apt-get update && apt-get upgrade -y
+RUN gocmd upgrade
 
 # Install TensorFlow.
 # RUN pip install --upgrade pip && \
@@ -78,6 +79,8 @@ RUN cd && \
     echo "source activate cellprofiler" >> ~/.bashrc && \
     echo "export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64" >> ~/.bashrc && \
     /bin/bash -c "source activate cellprofiler"
+
+RUN pip install --no-deps cellprofiler==4.2.6 cellpose==2.2.3 cellpose[gui] csbdeep
 
 # add `cellprofiler` `cellpose` and `imagej` to Gnome Applications Menu
 RUN mkdir -p ~/.local/share/applications && \
@@ -106,8 +109,6 @@ RUN mkdir -p ~/.local/share/applications && \
 # Install CellProfiler Plugins
 RUN cd && \
     git clone https://github.com/CellProfiler/CellProfiler-plugins.git
-
-RUN gocmd upgrade
 
 # changes tmux layout while running
 COPY entry.sh /bin
