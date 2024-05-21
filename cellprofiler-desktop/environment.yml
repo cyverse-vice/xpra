@@ -33,3 +33,10 @@ dependencies:
 - pytorch-cuda=12.1
 - tensorflow
 - cudatoolkit
+- pip:
+     - cellprofiler==4.2.6
+     - cellpose==2.2.3
+     - cellpose[gui]
+     - csbdeep
+     - tensorflow
+

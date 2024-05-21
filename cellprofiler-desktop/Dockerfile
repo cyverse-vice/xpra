@@ -80,7 +80,7 @@ RUN cd && \
     echo "export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64" >> ~/.bashrc && \
     /bin/bash -c "source activate cellprofiler"
 
-RUN pip install --no-deps cellprofiler==4.2.6 cellpose==2.2.3 cellpose[gui] csbdeep
+# RUN pip install --no-deps cellprofiler==4.2.6 cellpose==2.2.3 cellpose[gui] csbdeep
 
 # add `cellprofiler` `cellpose` and `imagej` to Gnome Applications Menu
 RUN mkdir -p ~/.local/share/applications && \
